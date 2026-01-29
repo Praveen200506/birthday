@@ -73,6 +73,7 @@ const AudioPlayer = () => {
                 src={currentPlaylist[currentIndex]}
                 onEnded={nextSong}
                 autoPlay={userInteracted}
+                loop={currentPlaylist.length === 1}
             />
 
             <motion.div

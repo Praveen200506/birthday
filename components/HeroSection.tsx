@@ -148,11 +148,11 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                     <div className="absolute inset-0 bg-white/50 blur-3xl -z-10 rounded-full scale-[1.5]" />
 
                     <motion.h1
-                        className="text-7xl md:text-9xl font-handwriting text-stone-800 mb-6 drop-shadow-lg leading-tight"
+                        className="text-7xl md:text-9xl font-handwriting text-stone-800 mb-6 drop-shadow-2xl leading-tight tracking-wide"
                         animate={{
                             textShadow: [
                                 "0px 4px 8px rgba(0,0,0,0.1)",
-                                "0px 6px 12px rgba(0,0,0,0.15)",
+                                "0px 6px 16px rgba(0,0,0,0.15)",
                                 "0px 4px 8px rgba(0,0,0,0.1)",
                             ],
                         }}
@@ -163,17 +163,17 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                             className="text-mypink relative inline-block px-4"
                             animate={{
                                 textShadow: [
-                                    "0 0 10px rgba(255,105,180,0.4)",
-                                    "0 0 25px rgba(255,105,180,0.8)",
-                                    "0 0 10px rgba(255,105,180,0.4)",
+                                    "0 0 15px rgba(255,105,180,0.5)",
+                                    "0 0 30px rgba(255,105,180,0.8)",
+                                    "0 0 15px rgba(255,105,180,0.5)",
                                 ],
                             }}
                             transition={{ duration: 2.5, repeat: Infinity }}
                         >
                             Sharmila
                             <motion.span
-                                className="absolute -bottom-2 left-0 w-full h-1 bg-mypink/30 rounded-full"
-                                animate={{ scaleX: [1, 1.05, 1] }}
+                                className="absolute -bottom-2 left-0 w-full h-1 bg-mypink/40 rounded-full blur-[1px]"
+                                animate={{ scaleX: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }}
                                 transition={{ duration: 3, repeat: Infinity }}
                             />
                         </motion.span>
