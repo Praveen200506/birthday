@@ -1,0 +1,181 @@
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+
+interface CakeProps {
+    onAllCandlesOut: () => void;
+}
+
+const Cake = ({ onAllCandlesOut }: CakeProps) => {
+    const [candles, setCandles] = useState([true, true, true, true, true]);
+    const [celebrate, setCelebrate] = useState(false);
+    const [flameflickers, setFlameFlickers] = useState<number[]>([]);
+
+    useEffect(() => {
+        // Generate stable random values for animations on client-side only
+        setFlameFlickers([Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+    }, []);
+
+    const blowCandle = (index: number) => {
+        const newCandles = [...candles];
+        newCandles[index] = false;
+        setCandles(newCandles);
+
+        if (newCandles.every((c) => !c)) {
+            setCelebrate(true);
+            setTimeout(onAllCandlesOut, 1500);
+        }
+    };
+
+    return (
+        <div className="relative flex flex-col items-center justify-center py-20">
+            {/* Celebration Effects */}
+            <AnimatePresence>
+                {celebrate && (
+                    <motion.div className="absolute inset-0 pointer-events-none">
+                        {[...Array(12)].map((_, i) => (
+                            <motion.div
+                                key={i}
+                                className="absolute left-1/2 top-1/2 w-3 h-3 rounded-full"
+                                style={{
+                                    backgroundColor: ['#FFD700', '#FF69B4', '#00BFFF', '#32CD32'][i % 4]
+                                }}
+                                initial={{ opacity: 1, x: 0, y: 0, scale: 0 }}
+                                animate={{
+                                    opacity: 0,
+                                    x: (Math.random() - 0.5) * 400,
+                                    y: (Math.random() - 0.5) * 400,
+                                    scale: 1.5
+                                }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                            />
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Candles Container */}
+            <div className="relative flex gap-6 z-20 -mb-4">
+                {candles.map((isOn, i) => (
+                    <motion.div
+                        key={i}
+                        className="relative cursor-pointer group"
+                        onClick={() => isOn && blowCandle(i)}
+                        whileHover={{ scale: isOn ? 1.1 : 1 }}
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
+                    >
+                        {/* Flame */}
+                        <AnimatePresence>
+                            {isOn && (
+                                <motion.div
+                                    className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-6 origin-bottom"
+                                    animate={{
+                                        scale: [1, 1.1, 1],
+                                        rotate: [-2, 2, -2],
+                                        filter: ["blur(0.5px)", "blur(1px)", "blur(0.5px)"]
+                                    }}
+                                    transition={{
+                                        duration: 0.1 + (flameflickers[i] || 0) * 0.2,
+                                        repeat: Infinity,
+                                        repeatType: "reverse"
+                                    }}
+                                >
+                                    {/* Inner Flame */}
+                                    <div className="w-full h-full bg-gradient-to-t from-orange-500 via-yellow-400 to-white rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] shadow-[0_0_10px_orange]" />
+                                    {/* Outer Glow */}
+                                    <div className="absolute inset-0 bg-orange-400 blur-md opacity-50 animate-pulse" />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Wick */}
+                        <div className="w-1 h-3 bg-gray-800 mx-auto -mb-1 relative z-10" />
+
+                        {/* Candle Stick */}
+                        <div
+                            className="w-4 h-16 rounded-sm shadow-md relative overflow-hidden"
+                            style={{
+                                background: `repeating-linear-gradient(
+                                    45deg,
+                                    ${i % 2 ? '#ff9a9e' : '#a18cd1'},
+                                    ${i % 2 ? '#ff9a9e' : '#a18cd1'} 10px,
+                                    ${i % 2 ? '#fecfef' : '#fbc2eb'} 10px,
+                                    ${i % 2 ? '#fecfef' : '#fbc2eb'} 20px
+                                )`
+                            }}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Cake Structure */}
+            <div className="relative flex flex-col items-center">
+                {/* Top Frosting Layer */}
+                <motion.div
+                    className="w-52 h-16 bg-gradient-to-b from-white to-pink-50 rounded-t-2xl shadow-lg z-10 relative overflow-hidden flex justify-center items-end"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", bounce: 0.5 }}
+                >
+                    {/* Drips */}
+                    <div className="absolute -bottom-2 w-full flex justify-between px-2">
+                        {[...Array(7)].map((_, i) => (
+                            <div key={i} className="w-6 h-8 bg-pink-50 rounded-b-full shadow-sm" />
+                        ))}
+                    </div>
+                    {/* Sprinkles (Static for safety, hydration friendly) */}
+                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#ff69b4_2px,transparent_2px)] [background-size:16px_16px]" />
+                </motion.div>
+
+                {/* Middle Cake Layer */}
+                <motion.div
+                    className="w-64 h-20 bg-gradient-to-r from-pink-200 via-pink-300 to-pink-200 rounded-lg shadow-inner z-0 -mt-2 relative flex items-center justify-center border-t border-white/40"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring" }}
+                >
+                    <div className="w-full h-4 bg-white/30 skew-y-1 backdrop-blur-sm" />
+                </motion.div>
+
+                {/* Bottom Cake Layer */}
+                <motion.div
+                    className="w-80 h-24 bg-gradient-to-r from-purple-200 via-purple-300 to-purple-200 rounded-b-3xl shadow-2xl -mt-2 relative border-t border-white/30 overflow-hidden"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.4, type: "spring" }}
+                >
+                    {/* Decorative Wave */}
+                    <div className="absolute bottom-0 w-full h-8 bg-white/20 blur-xl" />
+                </motion.div>
+
+                {/* Cake Plate / Shadow */}
+                <motion.div
+                    className="w-96 h-4 bg-gray-300/50 rounded-[50%] blur-sm mt-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                />
+            </div>
+
+            {/* Instruction / Message */}
+            <motion.p
+                className="mt-12 font-handwriting text-2xl text-mypink drop-shadow-sm"
+                animate={{
+                    opacity: [0.7, 1, 0.7],
+                    y: [0, -3, 0]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+            >
+                {candles.some((c) => c)
+                    ? "Make a wish & blow the candles! 🎂"
+                    : "Wishes do come true! ✨"}
+            </motion.p>
+        </div>
+    );
+};
+
+export default Cake;

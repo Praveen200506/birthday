@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --font-handwriting: var(--font-dancing);
+  --font-sans: var(--font-nunito);
+
+  --color-warm-cream: #FFF9F0;
+  --color-soft-pink: #FFD1DC;
+  --color-lavender: #E6E6FA;
+  --color-gold: #FFD700;
+  --color-mypink: #FFB7B2;
+  --color-foreground: #4A4A4A;
+}
+
+:root {
+  --background: var(--color-warm-cream);
+  --foreground: var(--color-foreground);
+}
+
+@layer base {
+  body {
+    background: linear-gradient(-45deg, #FFF9F5, #FDF2F8, #F3E8FF, #FFF9F5);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Custom scrollbar for a nicer feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-soft-pink);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mypink);
+}
