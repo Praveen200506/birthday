@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Dancing_Script, Nunito } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import AudioPlayer from "@/components/AudioPlayer";
+import GlobalLockWrapper from "@/components/GlobalLockWrapper";
 import "./globals.css";
 
 const dancingScript = Dancing_Script({
@@ -41,14 +42,16 @@ export default function RootLayout({
           }}
         />
 
-        <FloatingParticles />
-        <CursorTrail />
-        <FinalScene />
-        <AudioPlayer />
-        <main className="relative z-10">
-          {children}
-        </main>
-        <Navbar />
+        <GlobalLockWrapper>
+          <FloatingParticles />
+          <CursorTrail />
+          <FinalScene />
+          <AudioPlayer />
+          <main className="relative z-10">
+            {children}
+          </main>
+          <Navbar />
+        </GlobalLockWrapper>
       </body>
     </html>
   );

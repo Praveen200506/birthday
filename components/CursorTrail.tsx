@@ -8,7 +8,7 @@ const CursorTrail = () => {
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            const newPoint = { x: e.clientX, y: e.clientY, id: Date.now() };
+            const newPoint = { x: e.clientX, y: e.clientY, id: Date.now() + Math.random() };
             setPoints((prev) => [...prev.slice(-15), newPoint]);
         };
 
