@@ -43,11 +43,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-warm-cream/50 flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-warm-cream/50 flex flex-col items-center justify-center p-3.5 xs:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/90 backdrop-blur-2xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white/80 relative overflow-hidden"
+        className="bg-white/90 backdrop-blur-2xl p-6 xs:p-8 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl w-full max-w-xs xs:max-w-sm sm:max-w-md border border-white/80 relative overflow-hidden"
       >
         {/* Soft Background Accents */}
         <div className="absolute top-0 right-0 w-36 h-36 bg-mypink/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />

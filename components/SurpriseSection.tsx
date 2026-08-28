@@ -41,48 +41,48 @@ const SurpriseSection = () => {
     };
 
     return (
-        <section className="py-32 px-4 text-center bg-transparent flex flex-col items-center justify-center relative z-10">
+        <section className="py-14 sm:py-24 px-3 sm:px-4 text-center bg-transparent flex flex-col items-center justify-center relative z-10 w-full max-w-full pb-28 sm:pb-32">
             {!candlesOut ? (
                 <Cake onAllCandlesOut={handleAllCandlesOut} />
             ) : (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-center"
+                    className="text-center px-4"
                 >
-                    <h3 className="text-4xl font-handwriting text-mypink mb-4">A Wish Came True! ✨</h3>
+                    <h3 className="text-3xl sm:text-4xl font-handwriting text-mypink mb-4">A Wish Came True! ✨</h3>
                 </motion.div>
             )}
 
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-md"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-3 xs:p-4 bg-black/30 backdrop-blur-md"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                     >
                         <motion.div
-                            className="bg-white/70 backdrop-blur-xl p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center relative overflow-hidden border border-white/40"
-                            initial={{ y: 100, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 100, opacity: 0 }}
+                            className="bg-white/85 backdrop-blur-xl p-6 xs:p-8 sm:p-10 rounded-2xl sm:rounded-[3rem] shadow-2xl max-w-sm sm:max-w-md w-full text-center relative overflow-hidden border border-white/60 mx-2"
+                            initial={{ y: 80, opacity: 0, scale: 0.95 }}
+                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                            exit={{ y: 80, opacity: 0, scale: 0.95 }}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-soft-pink via-lavender to-gold" />
-                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-gold/10 rounded-full blur-3xl" />
-                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-soft-pink/20 rounded-full blur-3xl" />
+                            <div className="absolute -top-10 -right-10 w-28 sm:w-32 h-28 sm:h-32 bg-gold/15 rounded-full blur-2xl" />
+                            <div className="absolute -bottom-10 -left-10 w-28 sm:w-32 h-28 sm:h-32 bg-soft-pink/25 rounded-full blur-2xl" />
 
-                            <h4 className="text-4xl font-handwriting text-mypink mb-6">Happy Birthday! 🎂</h4>
-                            <p className="text-xl font-handwriting text-gray-700 leading-relaxed">
+                            <h4 className="text-3xl sm:text-4xl font-handwriting text-mypink mb-4 sm:mb-6">Happy Birthday! 🎂</h4>
+                            <p className="text-lg sm:text-xl font-handwriting text-stone-700 leading-relaxed">
                                 &ldquo;May your day be as bright as your smile and as beautiful as your heart.&rdquo;
                             </p>
-                            <div className="mt-8 flex justify-center gap-4">
+                            <div className="mt-6 sm:mt-8 flex justify-center gap-4">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => setIsOpen(false)}
-                                    className="px-8 py-3 bg-mypink text-white rounded-full font-sans text-sm shadow-lg shadow-pink-200"
+                                    className="px-7 sm:px-8 py-2.5 sm:py-3 bg-mypink text-white rounded-full font-sans text-xs sm:text-sm font-medium shadow-lg shadow-pink-200"
                                 >
                                     Thank You! ❤️
                                 </motion.button>

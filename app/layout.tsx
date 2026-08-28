@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Dancing_Script, Nunito } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   description: "A little digital gift for you.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#FFF9F0",
+};
+
 import FloatingParticles from "@/components/FloatingParticles";
 import CursorTrail from "@/components/CursorTrail";
 import FinalScene from "@/components/FinalScene";
@@ -33,18 +40,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full w-full overflow-x-hidden">
       <body
-        className={`${dancingScript.variable} ${nunito.variable} antialiased font-sans bg-warm-cream relative min-h-screen overflow-x-hidden`}
+        className={`${dancingScript.variable} ${nunito.variable} antialiased font-sans bg-warm-cream relative min-h-[100dvh] w-full max-w-full overflow-x-hidden`}
       >
-        {/* Global Noise Texture */}
-        <div
-          className="fixed inset-0 opacity-40 pointer-events-none z-0 mix-blend-multiply"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
-          }}
-        />
-
         <VisitorTracker />
         <Analytics />
         <SpeedInsights />
@@ -54,7 +53,7 @@ export default function RootLayout({
           <CursorTrail />
           <FinalScene />
           <AudioPlayer />
-          <main className="relative z-10">
+          <main className="relative z-10 w-full min-h-[100dvh]">
             {children}
           </main>
           <Navbar />

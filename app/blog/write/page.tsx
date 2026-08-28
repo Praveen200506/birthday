@@ -192,39 +192,39 @@ export default function AuthorDashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-warm-cream/40 pt-16 pb-36 px-4 md:px-8">
+    <main className="min-h-screen bg-warm-cream/40 pt-10 sm:pt-16 pb-32 sm:pb-36 px-3.5 sm:px-6 md:px-8">
       <BlogAuthWrapper>
         <div className="max-w-4xl mx-auto">
           {/* Top Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 mb-8 border-b border-stone-200/60">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-mypink/15 text-mypink flex items-center justify-center shadow-inner">
-                <Feather size={22} />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 mb-6 sm:mb-8 border-b border-stone-200/60">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-mypink/15 text-mypink flex items-center justify-center shadow-inner shrink-0">
+                <Feather size={20} className="sm:w-5 sm:h-5" />
               </div>
               <div>
-                <h1 className="text-3xl font-handwriting text-stone-800">
+                <h1 className="text-2xl sm:text-3xl font-handwriting text-stone-800">
                   Write a Story or Wish ✍️
                 </h1>
-                <p className="text-xs text-stone-500 font-sans">
+                <p className="text-[11px] sm:text-xs text-stone-500 font-sans">
                   Anyone can pen down a memory, birthday wish, or thought for Sharmila.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 self-end sm:self-auto">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-stone-50 border border-stone-200 text-xs font-medium text-stone-600 transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white hover:bg-stone-50 border border-stone-200 text-xs font-medium text-stone-600 transition-colors shadow-xs"
               >
-                <BookOpen size={14} /> Back to Journal
+                <BookOpen size={13} /> Back to Journal
               </Link>
 
               {isAdmin && (
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-colors shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-colors shadow-xs"
                 >
-                  <LogOut size={13} /> Admin Logout
+                  <LogOut size={12} /> Logout
                 </button>
               )}
             </div>
@@ -276,11 +276,11 @@ export default function AuthorDashboardPage() {
           </AnimatePresence>
 
           {/* Editor Form Container */}
-          <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-10 shadow-xl border border-white/80 mb-12">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-100">
-              <h2 className="text-xl font-bold font-serif text-stone-800 flex items-center gap-2">
-                <FileText size={18} className="text-mypink" />
-                {editingId ? "Edit Story" : "Compose Your Story or Wish"}
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] p-4 xs:p-6 md:p-10 shadow-xl border border-white/80 mb-8 sm:mb-12">
+            <div className="flex items-center justify-between mb-5 sm:mb-6 pb-3.5 sm:pb-4 border-b border-stone-100">
+              <h2 className="text-lg sm:text-xl font-bold font-serif text-stone-800 flex items-center gap-2">
+                <FileText size={17} className="text-mypink" />
+                <span>{editingId ? "Edit Story" : "Compose Your Story or Wish"}</span>
               </h2>
 
               {editingId && (
@@ -293,9 +293,9 @@ export default function AuthorDashboardPage() {
               )}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Author Name & Category */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-stone-600 mb-1.5">
                     Your Name (Author) *
@@ -305,7 +305,7 @@ export default function AuthorDashboardPage() {
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
                     placeholder="e.g., Praveen, Sharmila, A Bestie..."
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
                   />
                 </div>
 
@@ -316,7 +316,7 @@ export default function AuthorDashboardPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
                   >
                     <option value="Wishes">Wishes 🎂</option>
                     <option value="Memories">Memories 📸</option>
@@ -328,7 +328,7 @@ export default function AuthorDashboardPage() {
               </div>
 
               {/* Title & Custom Slug */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-stone-600 mb-1.5">
                     Story / Wish Title *
@@ -338,7 +338,7 @@ export default function AuthorDashboardPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g., Happy Birthday to my favorite person ✨"
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
                   />
                 </div>
 
@@ -351,7 +351,7 @@ export default function AuthorDashboardPage() {
                     value={coverImage}
                     onChange={(e) => setCoverImage(e.target.value)}
                     placeholder="/photos/image.jpg or https://..."
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
                   />
                 </div>
               </div>
@@ -366,7 +366,7 @@ export default function AuthorDashboardPage() {
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
                   placeholder="A short one-line summary or sweet note..."
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800"
                 />
               </div>
 
@@ -381,7 +381,7 @@ export default function AuthorDashboardPage() {
                       type="button"
                       onClick={() => setPreviewMode(false)}
                       className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                        !previewMode ? "bg-white text-stone-800 shadow-sm" : "text-stone-500"
+                        !previewMode ? "bg-white text-stone-800 shadow-xs" : "text-stone-500"
                       }`}
                     >
                       Write
@@ -390,7 +390,7 @@ export default function AuthorDashboardPage() {
                       type="button"
                       onClick={() => setPreviewMode(true)}
                       className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                        previewMode ? "bg-white text-stone-800 shadow-sm" : "text-stone-500"
+                        previewMode ? "bg-white text-stone-800 shadow-xs" : "text-stone-500"
                       }`}
                     >
                       Preview
@@ -402,28 +402,28 @@ export default function AuthorDashboardPage() {
                   <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    rows={9}
+                    rows={8}
                     placeholder="Write your heartfelt message here... You can use paragraphs, **bold**, *italic*, > quotes, and [links](url)..."
-                    className="w-full bg-stone-50 border border-stone-200 rounded-2xl p-4 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800 leading-relaxed"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm font-sans focus:outline-none focus:ring-2 focus:ring-mypink/40 text-stone-800 leading-relaxed"
                   />
                 ) : (
-                  <div className="min-h-[220px] p-6 bg-stone-50/50 rounded-2xl border border-stone-200">
+                  <div className="min-h-[200px] p-4 sm:p-6 bg-stone-50/50 rounded-xl sm:rounded-2xl border border-stone-200">
                     {content ? (
                       <MarkdownRenderer content={content} />
                     ) : (
-                      <p className="text-stone-400 italic text-sm">Write something to see a live preview here ✨</p>
+                      <p className="text-stone-400 italic text-xs sm:text-sm">Write something to see a live preview here ✨</p>
                     )}
                   </div>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-stone-100">
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-3 sm:pt-4 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => handleSubmit(true)}
                   disabled={submitting}
-                  className="px-8 py-3 rounded-full bg-mypink hover:bg-pink-400 text-white text-xs md:text-sm font-semibold transition-all shadow-md shadow-pink-200 flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-mypink hover:bg-pink-400 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-pink-200 flex items-center justify-center gap-2"
                 >
                   <Send size={14} />
                   <span>{editingId ? "Update Story" : "Publish to Journal 💖"}</span>

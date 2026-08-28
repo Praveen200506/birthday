@@ -19,7 +19,7 @@ const getPhotos = () => {
 export default function MemoriesPage() {
     const photos = getPhotos();
     return (
-        <main className="pt-20 min-h-screen bg-warm-cream">
+        <main className="min-h-screen bg-warm-cream w-full max-w-full overflow-x-hidden">
             <MemoryGallery images={photos} />
         </main>
     );

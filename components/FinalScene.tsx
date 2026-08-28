@@ -21,12 +21,12 @@ const FinalScene = () => {
             animate={{ opacity: 1 }}
         >
             <motion.div
-                className="text-center px-6"
+                className="text-center px-4 sm:px-6 max-w-2xl"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 2 }}
             >
-                <p className="text-3xl md:text-5xl font-handwriting leading-relaxed">
+                <p className="text-2xl xs:text-3xl md:text-5xl font-handwriting leading-relaxed">
                     Some people become memories. <br />
                     <span className="text-mypink">
                         You became my favorite story. ❤️
@@ -41,7 +41,7 @@ const FinalScene = () => {
                         setShow(false);
                         window.location.href = "/";
                     }}
-                    className="mt-12 px-8 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white font-sans text-lg hover:bg-white/20 transition-all"
+                    className="mt-8 sm:mt-12 px-6 sm:px-8 py-2.5 sm:py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white font-sans text-base sm:text-lg hover:bg-white/20 transition-all active:scale-95"
                 >
                     Back to Home 🏠
                 </motion.button>

@@ -17,9 +17,9 @@ const Navbar = () => {
     const pathname = usePathname();
 
     return (
-        <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+        <nav className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[calc(100vw-1.5rem)] px-1">
             <motion.div
-                className="bg-white/80 backdrop-blur-2xl rounded-full shadow-2xl border border-white/60 px-5 sm:px-6 py-2.5 sm:py-3 flex gap-4 sm:gap-8 items-center bg-gradient-to-b from-white/90 to-white/70 hover:shadow-pink-200/50 transition-shadow duration-300"
+                className="bg-white/85 backdrop-blur-2xl rounded-full shadow-2xl border border-white/70 px-3.5 xs:px-5 sm:px-6 py-2 sm:py-2.5 flex gap-2 xs:gap-4 sm:gap-7 md:gap-8 items-center bg-gradient-to-b from-white/95 to-white/75 hover:shadow-pink-200/50 transition-shadow duration-300"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 1, type: "spring", stiffness: 100, damping: 20 }}
@@ -27,18 +27,21 @@ const Navbar = () => {
                 {navItems.map((item) => {
                     const isActive = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);
                     return (
-                        <Link key={item.name} href={item.path} className="relative group">
+                        <Link key={item.name} href={item.path} className="relative group px-1 sm:px-1.5 py-0.5">
                             <div
-                                className={`flex flex-col items-center gap-1 transition-all duration-300 group-hover:scale-110 ${isActive ? "text-mypink" : "text-gray-400 hover:text-gray-600"
-                                    }`}
+                                className={`flex flex-col items-center gap-0.5 sm:gap-1 transition-all duration-300 group-hover:scale-105 active:scale-95 ${
+                                    isActive ? "text-mypink" : "text-stone-400 hover:text-stone-600"
+                                }`}
                             >
-                                <item.icon className="w-6 h-6 drop-shadow-sm" />
-                                <span className="text-[10px] font-sans font-medium tracking-wide">{item.name}</span>
+                                <item.icon className="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-sm" />
+                                <span className="text-[9px] xs:text-[10px] sm:text-[11px] font-sans font-medium tracking-tight sm:tracking-wide">
+                                    {item.name}
+                                </span>
 
                                 {isActive && (
                                     <motion.div
                                         layoutId="activeTab"
-                                        className="absolute -bottom-2 w-1 h-1 bg-mypink rounded-full shadow-[0_0_8px_2px_rgba(255,183,178,0.8)]"
+                                        className="absolute -bottom-1.5 sm:-bottom-2 w-1.5 h-1.5 bg-mypink rounded-full shadow-[0_0_8px_2px_rgba(255,183,178,0.9)]"
                                     />
                                 )}
                             </div>
