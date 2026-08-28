@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Image as ImageIcon, Heart, Gift } from "lucide-react";
+import { Home, Image as ImageIcon, Heart, Gift, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
     { name: "Memories", path: "/memories", icon: ImageIcon },
     { name: "Letter", path: "/letter", icon: Heart },
     { name: "Surprise", path: "/surprise", icon: Gift },
+    { name: "Blog", path: "/blog", icon: BookOpen },
 ];
 
 const Navbar = () => {
@@ -18,13 +19,13 @@ const Navbar = () => {
     return (
         <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
             <motion.div
-                className="bg-white/80 backdrop-blur-2xl rounded-full shadow-2xl border border-white/60 px-6 py-3 flex gap-8 items-center bg-gradient-to-b from-white/90 to-white/70 hover:shadow-pink-200/50 transition-shadow duration-300"
+                className="bg-white/80 backdrop-blur-2xl rounded-full shadow-2xl border border-white/60 px-5 sm:px-6 py-2.5 sm:py-3 flex gap-4 sm:gap-8 items-center bg-gradient-to-b from-white/90 to-white/70 hover:shadow-pink-200/50 transition-shadow duration-300"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 1, type: "spring", stiffness: 100, damping: 20 }}
             >
                 {navItems.map((item) => {
-                    const isActive = pathname === item.path;
+                    const isActive = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);
                     return (
                         <Link key={item.name} href={item.path} className="relative group">
                             <div

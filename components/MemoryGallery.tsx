@@ -14,10 +14,9 @@ const MemoryGallery = ({ images }: MemoryGalleryProps) => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [rotations, setRotations] = useState<number[]>([]);
     const [flash, setFlash] = useState(false);
-    const [shuffled, setShuffled] = useState<string[]>([]);
+    const [shuffled, setShuffled] = useState<string[]>(images);
 
     useEffect(() => {
-        setShuffled(images);
         const randomRotations = images.map(() => Math.random() * 10 - 5);
         setRotations(randomRotations);
     }, [images]);
@@ -134,6 +133,7 @@ const MemoryGallery = ({ images }: MemoryGalleryProps) => {
 
                             <img
                                 src={selectedImage}
+                                alt="Expanded memory"
                                 className="max-w-full max-h-[70vh] mx-auto rounded-lg"
                             />
 

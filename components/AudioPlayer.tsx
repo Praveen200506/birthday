@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Music, VolumeX, SkipForward } from "lucide-react";
 
 // Default fallbacks in case local files aren't there
@@ -22,6 +22,10 @@ const SONGS = {
     surprise: {
         urls: ["/music/surprise.mp3"],
         label: "Celebration Dance!"
+    },
+    blog: {
+        urls: ["/music/memories.mp3"],
+        label: "Nostalgic Memories"
     }
 };
 
@@ -38,6 +42,7 @@ const AudioPlayer = () => {
         if (pathname.includes("memories")) category = "memories";
         else if (pathname.includes("letter")) category = "letter";
         else if (pathname.includes("surprise")) category = "surprise";
+        else if (pathname.includes("blog")) category = "blog";
 
         const newPlaylist = SONGS[category].urls;
         setCurrentPlaylist(newPlaylist);

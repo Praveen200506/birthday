@@ -21,11 +21,12 @@ const HeroSection = ({ images }: HeroSectionProps) => {
         tapeAngle: number;
         handwrittenText: string;
         zIndex: number;
+        lightDuration: number;
     }[]>([]);
 
     const [containerHeight, setContainerHeight] = useState(1000);
     const [particles, setParticles] = useState<
-        { id: number; x: number; delay: number; duration: number }[]
+        { id: number; x: number; delay: number; duration: number; icon: string }[]
     >([]);
 
     // 🧠 Mouse Parallax
@@ -86,6 +87,7 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                     Math.floor(Math.random() * 6)
                 ],
                 zIndex: Math.floor(Math.random() * 10),
+                lightDuration: 6 + Math.random() * 4,
             };
         });
 
@@ -98,6 +100,7 @@ const HeroSection = ({ images }: HeroSectionProps) => {
             x: Math.random() * 100,
             delay: Math.random() * 10,
             duration: 15 + Math.random() * 10,
+            icon: Math.random() > 0.5 ? "❤️" : "✨",
         }));
         setParticles(newParticles);
     }, [images]);
@@ -133,7 +136,7 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                         ease: "linear",
                     }}
                 >
-                    {Math.random() > 0.5 ? "❤️" : "✨"}
+                    {particle.icon}
                 </motion.div>
             ))}
 
@@ -271,7 +274,7 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
                                         animate={{ x: ["-120%", "120%"] }}
                                         transition={{
-                                            duration: 6 + Math.random() * 4,
+                                            duration: config.lightDuration,
                                             repeat: Infinity,
                                             ease: "easeInOut",
                                         }}

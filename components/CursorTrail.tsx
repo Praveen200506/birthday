@@ -19,7 +19,7 @@ const CursorTrail = () => {
     return (
         <div className="fixed inset-0 pointer-events-none z-[9999]">
             <AnimatePresence>
-                {points.map((p, i) => (
+                {points.map((p) => (
                     <motion.div
                         key={p.id}
                         className="absolute w-2 h-2 bg-mypink/40 rounded-full blur-[1px]"

@@ -23,6 +23,9 @@ export const metadata: Metadata = {
 import FloatingParticles from "@/components/FloatingParticles";
 import CursorTrail from "@/components/CursorTrail";
 import FinalScene from "@/components/FinalScene";
+import VisitorTracker from "@/components/VisitorTracker";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({
   children,
@@ -41,6 +44,10 @@ export default function RootLayout({
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
           }}
         />
+
+        <VisitorTracker />
+        <Analytics />
+        <SpeedInsights />
 
         <GlobalLockWrapper>
           <FloatingParticles />

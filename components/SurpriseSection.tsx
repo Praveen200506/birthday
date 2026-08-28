@@ -19,7 +19,7 @@ const SurpriseSection = () => {
             return Math.random() * (max - min) + min;
         }
 
-        const interval: any = setInterval(function () {
+        const interval: ReturnType<typeof setInterval> = setInterval(function () {
             const timeLeft = animationEnd - Date.now();
 
             if (timeLeft <= 0) {
@@ -75,7 +75,7 @@ const SurpriseSection = () => {
 
                             <h4 className="text-4xl font-handwriting text-mypink mb-6">Happy Birthday! 🎂</h4>
                             <p className="text-xl font-handwriting text-gray-700 leading-relaxed">
-                                "May your day be as bright as your smile and as beautiful as your heart."
+                                &ldquo;May your day be as bright as your smile and as beautiful as your heart.&rdquo;
                             </p>
                             <div className="mt-8 flex justify-center gap-4">
                                 <motion.button

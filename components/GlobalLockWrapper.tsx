@@ -13,10 +13,9 @@ export default function GlobalLockWrapper({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-        // Check session storage to persist unlock status across refreshes/navigation
-        const unlocked = sessionStorage.getItem("isUnlocked");
+        const unlocked = typeof window !== "undefined" ? sessionStorage.getItem("isUnlocked") : null;
         if (unlocked === "true") setIsLocked(false);
+        setMounted(true);
     }, []);
 
     const handleUnlock = () => {

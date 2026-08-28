@@ -3,6 +3,21 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
+const CELEBRATION_PARTICLES = [
+    { x: -120, y: -150, color: '#FFD700' },
+    { x: 140, y: -160, color: '#FF69B4' },
+    { x: -80, y: 120, color: '#00BFFF' },
+    { x: 90, y: 130, color: '#32CD32' },
+    { x: -160, y: -60, color: '#FFD700' },
+    { x: 170, y: -40, color: '#FF69B4' },
+    { x: -130, y: 80, color: '#00BFFF' },
+    { x: 120, y: 70, color: '#32CD32' },
+    { x: -50, y: -180, color: '#FFD700' },
+    { x: 60, y: -190, color: '#FF69B4' },
+    { x: -180, y: 30, color: '#00BFFF' },
+    { x: 190, y: 20, color: '#32CD32' },
+];
+
 interface CakeProps {
     onAllCandlesOut: () => void;
 }
@@ -14,7 +29,7 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
 
     useEffect(() => {
         // Generate stable random values for animations on client-side only
-        setFlameFlickers([Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+        setFlameFlickers([0.4, 0.7, 0.2, 0.9, 0.5]);
     }, []);
 
     const blowCandle = (index: number) => {
@@ -34,18 +49,16 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
             <AnimatePresence>
                 {celebrate && (
                     <motion.div className="absolute inset-0 pointer-events-none">
-                        {[...Array(12)].map((_, i) => (
+                        {CELEBRATION_PARTICLES.map((particle, i) => (
                             <motion.div
                                 key={i}
                                 className="absolute left-1/2 top-1/2 w-3 h-3 rounded-full"
-                                style={{
-                                    backgroundColor: ['#FFD700', '#FF69B4', '#00BFFF', '#32CD32'][i % 4]
-                                }}
+                                style={{ backgroundColor: particle.color }}
                                 initial={{ opacity: 1, x: 0, y: 0, scale: 0 }}
                                 animate={{
                                     opacity: 0,
-                                    x: (Math.random() - 0.5) * 400,
-                                    y: (Math.random() - 0.5) * 400,
+                                    x: particle.x,
+                                    y: particle.y,
                                     scale: 1.5
                                 }}
                                 transition={{ duration: 1, ease: "easeOut" }}
