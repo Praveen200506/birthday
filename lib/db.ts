@@ -23,7 +23,7 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
  */
 export async function withDbTimeout<T>(
   promise: Promise<T>,
-  timeoutMs = 1500,
+  timeoutMs = 6000,
   fallbackMessage = "Database query timed out"
 ): Promise<T> {
   let timer: NodeJS.Timeout;

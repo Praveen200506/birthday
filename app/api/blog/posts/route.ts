@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
         where,
         orderBy: { createdAt: "desc" },
       }),
-      1500
+      6000
     );
 
     return NextResponse.json({
@@ -136,9 +136,12 @@ export async function POST(req: NextRequest) {
     if (!finalSlug) finalSlug = `story-${Date.now()}`;
 
     // Check if slug exists
-    const existing = await prisma.blogPost.findUnique({
-      where: { slug: finalSlug },
-    });
+    const existing = await withDbTimeout(
+      prisma.blogPost.findUnique({
+        where: { slug: finalSlug },
+      }),
+      6000
+    );
     if (existing) {
       finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
     }
@@ -147,19 +150,22 @@ export async function POST(req: NextRequest) {
     const cleanExcerpt = excerpt?.trim() || cleanContent.slice(0, 160).replace(/[#*`_]/g, "") + "...";
     const readingTime = calculateReadingTime(cleanContent);
 
-    const post = await prisma.blogPost.create({
-      data: {
-        title: cleanTitle,
-        slug: finalSlug,
-        content: cleanContent,
-        excerpt: cleanExcerpt,
-        authorName: authorName.trim() || "Praveen",
-        coverImage: coverImage?.trim() || null,
-        category: category.trim() || "Memories",
-        readingTime,
-        published: Boolean(published),
-      },
-    });
+    const post = await withDbTimeout(
+      prisma.blogPost.create({
+        data: {
+          title: cleanTitle,
+          slug: finalSlug,
+          content: cleanContent,
+          excerpt: cleanExcerpt,
+          authorName: authorName.trim() || "Praveen",
+          coverImage: coverImage?.trim() || null,
+          category: category.trim() || "Memories",
+          readingTime,
+          published: Boolean(published),
+        },
+      }),
+      8000
+    );
 
     return NextResponse.json({
       success: true,
@@ -168,13 +174,18 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Error creating blog post:", error);
+    const errMsg = (error as Error)?.message || "";
+    const isConnError = errMsg.includes("Can't reach database") || errMsg.includes("timed out") || errMsg.includes("InitializationError");
+    
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to create post.",
-        error: process.env.NODE_ENV === "development" ? (error as Error)?.message : undefined,
+        message: isConnError
+          ? "Database connection timed out or is temporarily unreachable. If on Supabase free tier, check if the project is active."
+          : "Failed to create post.",
+        error: process.env.NODE_ENV === "development" ? errMsg : undefined,
       },
-      { status: 500 }
+      { status: isConnError ? 503 : 500 }
     );
   }
 }

@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       prisma.blogPost.findUnique({
         where: { slug },
       }),
-      1000
+      6000
     );
 
     if (!post || !post.published) {
@@ -61,7 +61,7 @@ export default async function BlogPostPage({ params }: Props) {
         prisma.blogPost.findUnique({
           where: { slug },
         }),
-        1500
+        6000
       );
     } catch (err) {
       console.error("Error fetching post by slug:", err);

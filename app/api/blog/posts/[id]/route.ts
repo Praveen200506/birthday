@@ -43,7 +43,7 @@ export async function GET(
           OR: [{ id }, { slug: id }],
         },
       }),
-      1500
+      6000
     );
 
     if (!post) {
@@ -106,9 +106,12 @@ export async function PUT(
       published,
     } = body;
 
-    const existing = await prisma.blogPost.findUnique({
-      where: { id },
-    });
+    const existing = await withDbTimeout(
+      prisma.blogPost.findUnique({
+        where: { id },
+      }),
+      6000
+    );
 
     if (!existing) {
       return NextResponse.json(
@@ -133,9 +136,12 @@ export async function PUT(
     if (customSlug && customSlug !== existing.slug) {
       const formattedSlug = slugify(customSlug);
       // Check if unique
-      const slugConflict = await prisma.blogPost.findUnique({
-        where: { slug: formattedSlug },
-      });
+      const slugConflict = await withDbTimeout(
+        prisma.blogPost.findUnique({
+          where: { slug: formattedSlug },
+        }),
+        6000
+      );
       if (slugConflict && slugConflict.id !== id) {
         return NextResponse.json(
           { success: false, message: "Slug already exists. Please choose another." },
@@ -145,10 +151,13 @@ export async function PUT(
       updateData.slug = formattedSlug;
     }
 
-    const updatedPost = await prisma.blogPost.update({
-      where: { id },
-      data: updateData,
-    });
+    const updatedPost = await withDbTimeout(
+      prisma.blogPost.update({
+        where: { id },
+        data: updateData,
+      }),
+      8000
+    );
 
     return NextResponse.json({
       success: true,
@@ -157,9 +166,17 @@ export async function PUT(
     });
   } catch (error) {
     console.error("Error updating post:", error);
+    const errMsg = (error as Error)?.message || "";
+    const isConnError = errMsg.includes("Can't reach database") || errMsg.includes("timed out") || errMsg.includes("InitializationError");
+
     return NextResponse.json(
-      { success: false, message: "Failed to update post." },
-      { status: 500 }
+      {
+        success: false,
+        message: isConnError
+          ? "Database connection timed out or is temporarily unreachable."
+          : "Failed to update post.",
+      },
+      { status: isConnError ? 503 : 500 }
     );
   }
 }
@@ -187,9 +204,12 @@ export async function DELETE(
   }
 
   try {
-    await prisma.blogPost.delete({
-      where: { id },
-    });
+    await withDbTimeout(
+      prisma.blogPost.delete({
+        where: { id },
+      }),
+      6000
+    );
 
     return NextResponse.json({
       success: true,
@@ -197,9 +217,17 @@ export async function DELETE(
     });
   } catch (error) {
     console.error("Error deleting post:", error);
+    const errMsg = (error as Error)?.message || "";
+    const isConnError = errMsg.includes("Can't reach database") || errMsg.includes("timed out") || errMsg.includes("InitializationError");
+
     return NextResponse.json(
-      { success: false, message: "Failed to delete post." },
-      { status: 500 }
+      {
+        success: false,
+        message: isConnError
+          ? "Database connection timed out or is temporarily unreachable."
+          : "Failed to delete post.",
+      },
+      { status: isConnError ? 503 : 500 }
     );
   }
 }
