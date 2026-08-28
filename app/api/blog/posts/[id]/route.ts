@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { prisma, isDatabaseConfigured, withDbTimeout } from "@/lib/db";
 import {
   verifyBlogAdminSession,
   verifyBlogReaderSession,
@@ -37,11 +37,14 @@ export async function GET(
   }
 
   try {
-    const post = await prisma.blogPost.findFirst({
-      where: {
-        OR: [{ id }, { slug: id }],
-      },
-    });
+    const post = await withDbTimeout(
+      prisma.blogPost.findFirst({
+        where: {
+          OR: [{ id }, { slug: id }],
+        },
+      }),
+      1500
+    );
 
     if (!post) {
       return NextResponse.json(

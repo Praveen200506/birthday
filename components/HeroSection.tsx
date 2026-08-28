@@ -55,11 +55,11 @@ const HeroSection = ({ images }: HeroSectionProps) => {
 
     // Deterministic particles generated once
     const particles = useMemo(() => {
-        return Array.from({ length: 16 }).map((_, i) => ({
+        return Array.from({ length: 8 }).map((_, i) => ({
             id: i,
             x: (pseudoRandom(i * 3 + 1) * 94 + 3).toFixed(2),
             delay: (pseudoRandom(i * 5 + 2) * 6).toFixed(2),
-            duration: (14 + pseudoRandom(i * 7 + 3) * 8).toFixed(2),
+            duration: (16 + pseudoRandom(i * 7 + 3) * 8).toFixed(2),
             icon: pseudoRandom(i * 9 + 4) > 0.5 ? "❤️" : "✨",
         }));
     }, []);
@@ -212,11 +212,11 @@ const HeroSection = ({ images }: HeroSectionProps) => {
             </div>
 
             {/* Photo Wall */}
-            <div className="absolute inset-0 w-full h-full z-10 pointer-events-none">
+            <div className="absolute inset-0 w-full h-full z-10">
                 {configs.map((config) => (
                     <div
                         key={config.img}
-                        className="absolute pointer-events-auto"
+                        className="absolute"
                         style={{
                             left: `${config.left}%`,
                             top: `${config.top}px`,
@@ -254,7 +254,7 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                                 className="bg-white p-2 xs:p-2.5 sm:p-3 pb-6 xs:pb-7 sm:pb-8 w-[135px] xs:w-[155px] sm:w-[190px] md:w-[220px] shadow-lg sm:shadow-xl relative transition-shadow duration-300 hover:shadow-2xl rounded-xs"
                                 whileHover={{
                                     scale: 1.06,
-                                    zIndex: 50,
+                                    zIndex: 30,
                                     rotate: 0,
                                     transition: { duration: 0.2 },
                                 }}
@@ -274,7 +274,8 @@ const HeroSection = ({ images }: HeroSectionProps) => {
                                         width={300}
                                         height={400}
                                         className="object-cover w-full h-full"
-                                        loading="lazy"
+                                        loading={config.id < 4 ? "eager" : "lazy"}
+                                        sizes="(max-width: 400px) 135px, (max-width: 768px) 155px, (max-width: 1024px) 190px, 220px"
                                     />
 
                                     {/* Vintage Overlay */}

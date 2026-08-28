@@ -1,47 +1,36 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 const FloatingParticles = () => {
-    const [particles, setParticles] = useState<{ id: number; x: number; y: number; size: number; duration: number; delay: number }[]>([]);
-
-    useEffect(() => {
-        const newParticles = Array.from({ length: 20 }).map((_, i) => ({
+    // Generate particles once with deterministic positions
+    const particles = useMemo(() => {
+        return Array.from({ length: 12 }).map((_, i) => ({
             id: i,
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            size: Math.random() * 20 + 10,
-            duration: Math.random() * 10 + 10,
-            delay: Math.random() * 5,
+            x: ((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 * 100 + 100) % 100,
+            size: 10 + (i % 5) * 4,
+            duration: 12 + (i % 7) * 3,
+            delay: (i % 5) * 2,
+            emoji: i % 2 === 0 ? "❤️" : "✨",
         }));
-        setParticles(newParticles);
     }, []);
 
     return (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-            <AnimatePresence>
-                {particles.map((p) => (
-                    <motion.div
-                        key={p.id}
-                        className="absolute text-soft-pink/20"
-                        initial={{ y: "110vh", x: `${p.x}vw`, opacity: 0 }}
-                        animate={{
-                            y: "-10vh",
-                            opacity: [0, 1, 1, 0],
-                        }}
-                        transition={{
-                            duration: p.duration,
-                            repeat: Infinity,
-                            delay: p.delay,
-                            ease: "linear",
-                        }}
-                        style={{ fontSize: p.size }}
-                    >
-                        {p.id % 2 === 0 ? "❤️" : "✨"}
-                    </motion.div>
-                ))}
-            </AnimatePresence>
+            {particles.map((p) => (
+                <div
+                    key={p.id}
+                    className="absolute text-soft-pink/20 floating-particle"
+                    style={{
+                        left: `${p.x}vw`,
+                        fontSize: p.size,
+                        animationDuration: `${p.duration}s`,
+                        animationDelay: `${p.delay}s`,
+                    }}
+                >
+                    {p.emoji}
+                </div>
+            ))}
         </div>
     );
 };

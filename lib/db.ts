@@ -17,4 +17,27 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
+/**
+ * Execute a database query with a hard timeout to prevent slow hanging requests
+ * when database is offline, paused, or unreachable.
+ */
+export async function withDbTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs = 1500,
+  fallbackMessage = "Database query timed out"
+): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(fallbackMessage));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
 export default prisma;

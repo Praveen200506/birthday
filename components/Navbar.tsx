@@ -17,12 +17,12 @@ const Navbar = () => {
     const pathname = usePathname();
 
     return (
-        <nav className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[calc(100vw-1.5rem)] px-1">
+        <nav className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] w-auto max-w-[calc(100vw-1.5rem)] px-1">
             <motion.div
                 className="bg-white/85 backdrop-blur-2xl rounded-full shadow-2xl border border-white/70 px-3.5 xs:px-5 sm:px-6 py-2 sm:py-2.5 flex gap-2 xs:gap-4 sm:gap-7 md:gap-8 items-center bg-gradient-to-b from-white/95 to-white/75 hover:shadow-pink-200/50 transition-shadow duration-300"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 1, type: "spring", stiffness: 100, damping: 20 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 120, damping: 20 }}
             >
                 {navItems.map((item) => {
                     const isActive = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);

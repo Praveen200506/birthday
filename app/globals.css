@@ -99,3 +99,26 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, var(--color-mypink), #ff9e99);
 }
+
+/* Floating Particles — pure CSS, no JS re-renders */
+@keyframes floatUp {
+  0% {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh);
+    opacity: 0;
+  }
+}
+
+.floating-particle {
+  animation: floatUp linear infinite;
+  will-change: transform, opacity;
+}

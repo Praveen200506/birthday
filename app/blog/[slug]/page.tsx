@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { BlogPost } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { prisma, isDatabaseConfigured, withDbTimeout } from "@/lib/db";
 import BlogAuthWrapper from "@/components/blog/BlogAuthWrapper";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
 import { ArrowLeft, Clock, Calendar, User, BookOpen } from "lucide-react";
@@ -21,9 +21,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   try {
-    const post = await prisma.blogPost.findUnique({
-      where: { slug },
-    });
+    const post = await withDbTimeout(
+      prisma.blogPost.findUnique({
+        where: { slug },
+      }),
+      1000
+    );
 
     if (!post || !post.published) {
       return {
@@ -54,9 +57,12 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (isDatabaseConfigured()) {
     try {
-      post = await prisma.blogPost.findUnique({
-        where: { slug },
-      });
+      post = await withDbTimeout(
+        prisma.blogPost.findUnique({
+          where: { slug },
+        }),
+        1500
+      );
     } catch (err) {
       console.error("Error fetching post by slug:", err);
     }

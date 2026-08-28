@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { prisma, isDatabaseConfigured, withDbTimeout } from "@/lib/db";
 import {
   verifyBlogAdminSession,
   verifyBlogReaderSession,
@@ -57,10 +57,13 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const posts = await prisma.blogPost.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-    });
+    const posts = await withDbTimeout(
+      prisma.blogPost.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+      }),
+      1500
+    );
 
     return NextResponse.json({
       success: true,

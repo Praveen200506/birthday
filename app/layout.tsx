@@ -53,7 +53,7 @@ export default function RootLayout({
           <CursorTrail />
           <FinalScene />
           <AudioPlayer />
-          <main className="relative z-10 w-full min-h-[100dvh]">
+          <main className="relative w-full min-h-[100dvh]">
             {children}
           </main>
           <Navbar />
