@@ -11,7 +11,7 @@ const SONGS = {
     memories: { urls: [getAssetUrl("music/memories.mp3")], label: "Nostalgic Memories" },
     letter: { urls: [getAssetUrl("music/memories.mp3")], label: "Heartfelt Piano" },
     surprise: { urls: [getAssetUrl("music/surprise.mp3")], label: "Celebration Dance!" },
-    blog: { urls: [getAssetUrl("music/memories.mp3")], label: "Nostalgic Memories" },
+    blog: { urls: [getAssetUrl("music/blog.mpeg")], label: "Blog Music" },
 } as const;
 
 type Category = keyof typeof SONGS;
