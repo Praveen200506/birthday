@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const message = ` Asalu nenu eppudu peddaga cheppanu kani, nijam cheppalante naku nuvvu chala special. Mana navvulu, manam matladukune late-night kaburlu, inka naa life ni intha beautiful ga marchina prathi kshananki thanks. Nuvvu naa life lo undatam nenu cheskunna adrushtam. Happy Birthday!`;
+const message = ` Hey Happy Birthday!.. Be happy and stay strong.. I hope you get everything you want. Be you..!✨ Once again happy birthday - from your former friend`;
 
 const BirthdayLetter = () => {
     const [displayedText, setDisplayedText] = useState("");
