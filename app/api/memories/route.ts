@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { randomUUID } from "node:crypto";
 import { prisma, isDatabaseConfigured, withDbTimeout } from "@/lib/db";
 import {
   BLOG_ADMIN_SESSION_COOKIE,

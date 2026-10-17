@@ -152,25 +152,25 @@ BLOG_ADMIN_PASSWORD_HASH="<generated_password_hash>"
 
 ## 🖼️ Dynamic Memories Gallery
 
-The Memories page starts empty and now reads its memories from PostgreSQL. The author can add a photo and optional caption from the gallery; the browser uploads the image directly to Supabase Storage with a short-lived signed upload token, and the app saves the title, caption, public image URL, storage path, and timestamp in the \`Memory\` table. New memories appear immediately and remain available on later visits.
+The Memories page starts empty and now reads its memories from PostgreSQL. The author can add a photo and optional caption from the gallery; the browser uploads the image directly to Supabase Storage with a short-lived signed upload token, and the app saves the title, caption, public image URL, storage path, and timestamp in the `Memory` table. New memories appear immediately and remain available on later visits.
 
 ### One-time setup
 
-1. In Supabase Storage, create a **public** bucket named \`birthday-assets\` (or choose another name and use it consistently below). Public access is required for the gallery's image URLs to display to visitors.
-2. Add the variables from \`.env.example\` to your local environment and Vercel Project Settings:
-   - \`SUPABASE_URL\` and \`NEXT_PUBLIC_SUPABASE_URL\`: the same Supabase project URL.
-   - \`SUPABASE_SERVICE_ROLE_KEY\`: Supabase service-role key; server only, **never** prefix it with \`NEXT_PUBLIC_\`.
-   - \`NEXT_PUBLIC_SUPABASE_ANON_KEY\`: the project's public anon/publishable key.
-   - \`SUPABASE_STORAGE_BUCKET\` and \`NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET\`: the same bucket name (default \`birthday-assets\`).
-   - \`DATABASE_URL\` (and \`DIRECT_URL\`, if your Prisma setup uses it): PostgreSQL connection strings.
+1. In Supabase Storage, create a **public** bucket named `birthday-assets` (or choose another name and use it consistently below). Public access is required for the gallery's image URLs to display to visitors.
+2. Add the variables from `.env.example` to your local environment and Vercel Project Settings:
+   - `SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_URL`: the same Supabase project URL.
+   - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service-role key; server only, **never** prefix it with `NEXT_PUBLIC_`.
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: the project's public anon/publishable key.
+   - `SUPABASE_STORAGE_BUCKET` and `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`: the same bucket name (default `birthday-assets`).
+   - `DATABASE_URL` (and `DIRECT_URL`, if your Prisma setup uses it): PostgreSQL connection strings.
 3. Apply the updated Prisma schema to the database once:
-   \`\`\`bash
+   ```bash
    npx prisma generate
    npx prisma db push
-   \`\`\`
-   The \`Memory\` table must exist before uploads can be saved. Run these commands in an environment with the correct \`DATABASE_URL\`; do not add schema-push to the Vercel build command.
-4. Configure \`BLOG_ADMIN_PASSWORD_HASH\` and \`BLOG_ADMIN_SESSION_SECRET\` in production. The password hash can be generated with \`node scripts/generate-pin-hash.mjs yourSecretPassword\`; use a random session secret of at least 32 characters. Memory upload endpoints fail closed in production if these are not configured.
-5. Set the Storage bucket's maximum file size to at least **8 MB** and restrict allowed MIME types to \`image/jpeg\`, \`image/png\`, \`image/webp\`, and \`image/gif\`.
+   ```
+   The `Memory` table must exist before uploads can be saved. Run these commands in an environment with the correct `DATABASE_URL`; do not add schema-push to the Vercel build command.
+4. Configure `BLOG_ADMIN_PASSWORD_HASH` and `BLOG_ADMIN_SESSION_SECRET` in production. The password hash can be generated with `node scripts/generate-pin-hash.mjs yourSecretPassword`; use a random session secret of at least 32 characters. Memory upload endpoints fail closed in production if these are not configured.
+5. Set the Storage bucket's maximum file size to **8 MB or less** and restrict allowed MIME types to `image/jpeg`, `image/png`, `image/webp`, and `image/gif`.
 
 ### Add a memory
 
