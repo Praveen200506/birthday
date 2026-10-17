@@ -1,158 +1,502 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { X, Shuffle } from "lucide-react";
-import memoryCaptions from "@/data/memoryCaptions";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertCircle,
+  CheckCircle,
+  ImagePlus,
+  Images,
+  LoaderCircle,
+  LockKeyhole,
+  Plus,
+  Shuffle,
+  Sparkles,
+  Upload,
+  X,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
-interface MemoryGalleryProps {
-    images: string[];
+interface Memory {
+  id: string;
+  title: string;
+  caption: string;
+  imageUrl: string;
+  createdAt: string;
 }
 
-const MemoryGallery = ({ images }: MemoryGalleryProps) => {
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [rotations, setRotations] = useState<number[]>([]);
-    const [flash, setFlash] = useState(false);
-    const [shuffled, setShuffled] = useState<string[]>(images);
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
-    useEffect(() => {
-        const randomRotations = images.map(() => Math.random() * 10 - 5);
-        setRotations(randomRotations);
-    }, [images]);
+export default function MemoryGallery() {
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [shuffledMemories, setShuffledMemories] = useState<Memory[]>([]);
+  const [rotations, setRotations] = useState<number[]>([]);
+  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
+  const [title, setTitle] = useState("");
+  const [caption, setCaption] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-    const shuffleImages = () => {
-        const shuffledArr = [...shuffled].sort(() => 0.5 - Math.random());
-        setShuffled(shuffledArr);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMemories() {
+      try {
+        const response = await fetch("/api/memories", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to load memories.");
+        }
+        if (!cancelled) setMemories(Array.isArray(data.memories) ? data.memories : []);
+      } catch (loadError) {
+        if (!cancelled) {
+          setError(loadError instanceof Error ? loadError.message : "Unable to load memories.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    async function checkAuthorSession() {
+      try {
+        const response = await fetch("/api/blog/auth/admin", { cache: "no-store" });
+        const data = await response.json();
+        if (!cancelled) setIsAdmin(Boolean(response.ok && data.authenticated));
+      } catch {
+        if (!cancelled) setIsAdmin(false);
+      } finally {
+        if (!cancelled) setAuthChecking(false);
+      }
+    }
+
+    void loadMemories();
+    void checkAuthorSession();
+    return () => {
+      cancelled = true;
     };
+  }, []);
 
-    const openImage = (src: string) => {
-        setFlash(true);
-        setTimeout(() => setFlash(false), 150);
-        setSelectedImage(src);
-        window.dispatchEvent(new Event("memory-open"));
-    };
+  useEffect(() => {
+    setShuffledMemories(memories);
+    setRotations(memories.map(() => Math.random() * 8 - 4));
+  }, [memories]);
 
-    const closeImage = () => {
-        setSelectedImage(null);
-        window.dispatchEvent(new Event("memory-close"));
-    };
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
 
-    return (
-        <section className="pt-16 sm:pt-24 pb-28 sm:pb-32 px-3 sm:px-6 bg-warm-cream/30 min-h-screen overflow-x-hidden">
-            {flash && (
-                <div className="fixed inset-0 bg-white z-50 pointer-events-none animate-ping" />
-            )}
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="mb-8 sm:mb-12 text-center"
+  const closeComposer = useCallback(() => {
+    setShowUploader(false);
+    setError(null);
+    setTitle("");
+    setCaption("");
+    setFile(null);
+  }, []);
+
+  const handleUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
+
+    if (!isAdmin) {
+      setError("Sign in through the author portal before adding memories.");
+      return;
+    }
+    if (!title.trim()) {
+      setError("Give this memory a title.");
+      return;
+    }
+    if (!file) {
+      setError("Choose an image to upload.");
+      return;
+    }
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setError("Use a JPG, PNG, WebP, or GIF image.");
+      return;
+    }
+    if (file.size <= 0 || file.size > MAX_IMAGE_SIZE) {
+      setError("Choose an image smaller than 8 MB.");
+      return;
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setError("Supabase public URL and anon key are missing from the app environment.");
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      const signedResponse = await fetch("/api/memories/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          size: file.size,
+        }),
+      });
+      const signedData = await signedResponse.json();
+      if (!signedResponse.ok || !signedData.success) {
+        throw new Error(signedData.message || "Could not prepare the image upload.");
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      });
+      const { error: uploadError } = await supabase.storage
+        .from(signedData.bucket)
+        .uploadToSignedUrl(signedData.path, signedData.token, file, {
+          contentType: file.type,
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw new Error("Supabase upload failed: " + uploadError.message);
+      }
+
+      const saveResponse = await fetch("/api/memories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          caption: caption.trim(),
+          storagePath: signedData.path,
+        }),
+      });
+      const saveData = await saveResponse.json();
+      if (!saveResponse.ok || !saveData.success) {
+        throw new Error(saveData.message || "The image uploaded, but the memory could not be saved.");
+      }
+
+      setMemories((current) => [saveData.memory, ...current]);
+      closeComposer();
+      setNotice("Your new memory has been added. ❤️");
+    } catch (uploadFailure) {
+      setError(uploadFailure instanceof Error ? uploadFailure.message : "Could not upload this memory.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const shuffleImages = () => {
+    setShuffledMemories((current) => [...current].sort(() => Math.random() - 0.5));
+  };
+
+  return (
+    <section className="min-h-screen overflow-x-hidden bg-warm-cream/30 px-3 pb-28 pt-16 sm:px-6 sm:pb-32 sm:pt-24">
+      <motion.header
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+        className="mx-auto mb-8 max-w-3xl text-center sm:mb-12"
+      >
+        <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-xs text-mypink shadow-sm">
+          <Sparkles size={14} /> Little things, forever memories
+        </p>
+        <h1 className="mb-3 text-4xl font-handwriting text-stone-800 sm:text-6xl">
+          Our Little Universe
+        </h1>
+        <p className="mx-auto max-w-xl text-sm leading-7 text-stone-500 sm:text-base">
+          A growing collection of moments worth keeping. Every new memory is saved and will be here the next time you visit.
+        </p>
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          {shuffledMemories.length > 1 && (
+            <button
+              type="button"
+              onClick={shuffleImages}
+              className="inline-flex items-center gap-2 rounded-full border border-white bg-white/90 px-5 py-3 text-sm text-stone-600 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-                <h2 className="text-3xl xs:text-4xl sm:text-5xl font-handwriting text-stone-800 mb-2 sm:mb-4">
-                    Our Little Universe 📸
-                </h2>
-                <p className="text-xs sm:text-base md:text-lg font-sans text-stone-500 mb-4 sm:mb-6">
-                    Click on a memory to bring it closer...
+              <Shuffle size={16} /> Shuffle memories
+            </button>
+          )}
+
+          {isAdmin ? (
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setNotice(null);
+                setShowUploader((current) => !current);
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-200 transition hover:-translate-y-0.5 hover:bg-pink-400"
+            >
+              {showUploader ? <X size={16} /> : <Plus size={17} />}
+              {showUploader ? "Close uploader" : "Add a memory"}
+            </button>
+          ) : !authChecking ? (
+            <Link
+              href="/blog/write/login"
+              className="inline-flex items-center gap-2 rounded-full border border-white bg-white/90 px-5 py-3 text-sm text-stone-600 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <LockKeyhole size={16} /> Author login to add memories
+            </Link>
+          ) : null}
+        </div>
+      </motion.header>
+
+      <div className="mx-auto max-w-2xl">
+        <AnimatePresence>
+          {showUploader && isAdmin && (
+            <motion.form
+              onSubmit={handleUpload}
+              initial={{ opacity: 0, y: 16, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: -8, height: 0 }}
+              className="mb-10 overflow-hidden rounded-3xl border border-white/80 bg-white/90 p-5 shadow-xl backdrop-blur-xl sm:p-8"
+            >
+              <div className="mb-6 flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-pink-50 text-mypink">
+                  <ImagePlus size={22} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-handwriting text-stone-800 sm:text-2xl">Save a new memory</h2>
+                  <p className="mt-1 text-xs leading-5 text-stone-500">
+                    The photo goes straight to your Supabase Storage bucket. Its title and caption are saved in PostgreSQL.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="memory-title" className="mb-1.5 block text-xs font-semibold text-stone-600">
+                    Memory title *
+                  </label>
+                  <input
+                    id="memory-title"
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                    maxLength={120}
+                    required
+                    placeholder="A day to remember"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-800 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-100"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="memory-caption" className="mb-1.5 block text-xs font-semibold text-stone-600">
+                    Caption (optional)
+                  </label>
+                  <textarea
+                    id="memory-caption"
+                    value={caption}
+                    onChange={(event) => setCaption(event.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    placeholder="Add a little story behind this photo..."
+                    className="w-full resize-y rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-6 text-stone-800 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-100"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="memory-image" className="mb-1.5 block text-xs font-semibold text-stone-600">
+                    Memory image * <span className="font-normal text-stone-400">(JPG, PNG, WebP or GIF; up to 8 MB)</span>
+                  </label>
+                  <input
+                    id="memory-image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    required
+                    onChange={(event) => {
+                      const nextFile = event.target.files?.[0] || null;
+                      setFile(nextFile);
+                      setError(null);
+                    }}
+                    className="block w-full cursor-pointer rounded-xl border border-dashed border-pink-200 bg-pink-50/40 p-3 text-xs text-stone-600 file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-xs file:font-semibold file:text-pink-500"
+                  />
+                  {previewUrl && (
+                    <div className="mt-4 flex items-center gap-4 rounded-2xl bg-stone-50 p-3">
+                      <img src={previewUrl} alt="Preview of the selected memory" className="h-24 w-24 rounded-xl object-cover" />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-stone-700">{file?.name}</p>
+                        <p className="mt-1 text-xs text-stone-400">{((file?.size || 0) / (1024 * 1024)).toFixed(2)} MB</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {error && (
+                <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs leading-5 text-red-700">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0" /> {error}
                 </p>
+              )}
 
-                <motion.button
-                    onClick={shuffleImages}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/90 backdrop-blur-md rounded-full shadow-md hover:shadow-lg text-mypink font-handwriting text-base sm:text-lg border border-white/60 transition-all"
+              <div className="mt-6 flex flex-wrap justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={closeComposer}
+                  disabled={submitting}
+                  className="rounded-full px-5 py-2.5 text-sm text-stone-500 transition hover:bg-stone-100 disabled:opacity-50"
                 >
-                    <Shuffle className="w-4 h-4 sm:w-5 sm:h-5" /> Shuffle Memories
-                </motion.button>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="inline-flex items-center gap-2 rounded-full bg-mypink px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitting ? <LoaderCircle size={16} className="animate-spin" /> : <Upload size={16} />}
+                  {submitting ? "Uploading..." : "Save memory"}
+                </button>
+              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
+
+        {notice && (
+          <p role="status" className="mb-6 flex items-center justify-center gap-2 rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-700">
+            <CheckCircle size={17} /> {notice}
+          </p>
+        )}
+
+        {error && !showUploader && (
+          <p role="alert" className="mb-6 flex items-center justify-center gap-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle size={17} /> {error}
+            <button type="button" onClick={() => setError(null)} aria-label="Dismiss error" className="ml-2 rounded-full p-1 hover:bg-red-100">
+              <X size={15} />
+            </button>
+          </p>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex min-h-64 items-center justify-center gap-3 text-sm text-stone-400">
+          <LoaderCircle size={20} className="animate-spin text-mypink" /> Gathering your memories...
+        </div>
+      ) : shuffledMemories.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto flex max-w-lg flex-col items-center rounded-3xl border border-white/80 bg-white/60 px-6 py-14 text-center shadow-sm"
+        >
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-mypink">
+            <Images size={28} />
+          </div>
+          <h2 className="mb-2 text-2xl font-handwriting text-stone-700">A fresh page for new memories</h2>
+          <p className="max-w-sm text-sm leading-6 text-stone-500">
+            No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.
+          </p>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setShowUploader(true)}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400"
+            >
+              <Plus size={17} /> Add the first memory
+            </button>
+          )}
+        </motion.div>
+      ) : (
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-4 pb-12 sm:gap-8">
+          {shuffledMemories.map((memory, index) => (
+            <motion.button
+              key={memory.id}
+              type="button"
+              layoutId={"memory-" + memory.id}
+              onClick={() => setSelectedMemory(memory)}
+              initial={{ opacity: 0, scale: 0.92 }}
+              whileInView={{ opacity: 1, scale: 1, rotate: rotations[index] || 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              whileHover={{ scale: 1.04, rotate: 0, zIndex: 10 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative w-[calc(50%-0.5rem)] max-w-[280px] cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 xs:w-[165px] sm:w-[240px] md:w-[280px]"
+              aria-label={"Open memory: " + memory.title}
+            >
+              <div className="relative h-full rounded-sm bg-white p-2 pb-4 shadow-md transition-shadow duration-300 group-hover:shadow-xl sm:p-3 sm:pb-6">
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-stone-100">
+                  <Image
+                    src={memory.imageUrl}
+                    alt={memory.title}
+                    fill
+                    sizes="(max-width: 640px) 45vw, (max-width: 768px) 240px, 280px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="px-1 pt-3">
+                  <p className="line-clamp-1 font-handwriting text-base text-stone-700 sm:text-xl">{memory.title}</p>
+                  {memory.caption && (
+                    <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-stone-400 sm:text-xs">{memory.caption}</p>
+                  )}
+                </div>
+              </div>
+              <span className="pointer-events-none absolute -right-1.5 -top-1.5 rounded-full border-2 border-white bg-pink-200 px-2 py-1 text-[9px] text-pink-700 shadow-sm">
+                ♥
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      )}
+
+      <AnimatePresence>
+        {selectedMemory && (
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedMemory.title}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3 backdrop-blur-md sm:p-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedMemory(null)}
+          >
+            <motion.div
+              layoutId={"memory-" + selectedMemory.id}
+              className="relative w-full max-w-4xl rounded-3xl bg-white/95 p-4 shadow-2xl sm:p-6"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedMemory(null)}
+                aria-label="Close memory"
+                className="absolute right-3 top-3 z-10 rounded-full bg-stone-900/70 p-2 text-white transition hover:bg-stone-900"
+              >
+                <X size={20} />
+              </button>
+              <div className="relative mx-auto max-h-[68vh] min-h-48 w-full overflow-hidden rounded-2xl bg-stone-100 sm:max-h-[72vh]">
+                <Image
+                  src={selectedMemory.imageUrl}
+                  alt={selectedMemory.title}
+                  width={1600}
+                  height={1200}
+                  unoptimized
+                  className="mx-auto max-h-[68vh] w-auto max-w-full object-contain sm:max-h-[72vh]"
+                />
+              </div>
+              <h2 className="mt-5 text-center font-handwriting text-2xl text-stone-800 sm:text-3xl">{selectedMemory.title}</h2>
+              {selectedMemory.caption && (
+                <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-6 text-stone-500">{selectedMemory.caption}</p>
+              )}
             </motion.div>
-
-            <div className="flex flex-wrap justify-center gap-3 xs:gap-4 sm:gap-8 max-w-7xl mx-auto pb-16">
-                {shuffled.map((src, index) => (
-                    <motion.div
-                        key={src}
-                        layoutId={`photo-${src}`}
-                        className="relative group cursor-pointer z-0 hover:z-20 w-[calc(50%-0.45rem)] xs:w-[165px] sm:w-[240px] md:w-[280px]"
-                        drag
-                        dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
-                        dragElastic={0.1}
-                        whileDrag={{ scale: 1.05, zIndex: 100 }}
-                        initial={{ opacity: 0, scale: 0.85 }}
-                        whileInView={{
-                            opacity: 1,
-                            scale: 1,
-                            rotate: rotations[index] || 0,
-                        }}
-                        viewport={{ once: true }}
-                        whileHover={{
-                            scale: 1.06,
-                            rotate: 0,
-                            transition: { type: "spring", stiffness: 300, damping: 20 },
-                        }}
-                        onClick={() => openImage(src)}
-                    >
-                        <div className="bg-white p-2 xs:p-2.5 sm:p-3 pb-7 xs:pb-8 sm:pb-12 shadow-md group-hover:shadow-xl transition-shadow duration-300 w-full rounded-xs sm:rounded-sm">
-                            <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 rounded-[2px]">
-                                <Image
-                                    src={src}
-                                    alt="Memory"
-                                    fill
-                                    sizes="(max-width: 640px) 165px, (max-width: 768px) 240px, 280px"
-                                    className="object-cover"
-                                    loading="lazy"
-                                />
-                            </div>
-
-                            <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 text-center font-handwriting text-stone-400 opacity-70 text-xs xs:text-sm sm:text-xl">
-                                moment #{index + 1}
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-
-            <AnimatePresence>
-                {selectedImage && (
-                    <motion.div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 xs:p-4"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={closeImage}
-                    >
-                        <motion.div
-                            className="relative max-w-4xl w-full p-4 sm:p-6 bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl"
-                            layoutId={`photo-${selectedImage}`}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button
-                                onClick={closeImage}
-                                aria-label="Close image preview"
-                                className="absolute top-3 right-3 sm:-top-10 sm:right-0 bg-stone-900/60 sm:bg-transparent text-white hover:text-mypink rounded-full p-1.5 sm:p-0 transition-colors z-10"
-                            >
-                                <X size={24} className="sm:w-8 sm:h-8" />
-                            </button>
-
-                            <div className="relative max-h-[60vh] sm:max-h-[70vh] flex items-center justify-center overflow-hidden rounded-xl bg-stone-50">
-                                <img
-                                    src={selectedImage}
-                                    alt="Expanded memory"
-                                    className="max-w-full max-h-[60vh] sm:max-h-[70vh] object-contain rounded-lg sm:rounded-xl mx-auto"
-                                />
-                            </div>
-
-                            <p className="mt-4 sm:mt-6 text-center font-handwriting text-lg sm:text-2xl text-stone-700 leading-snug px-2">
-                                {memoryCaptions[
-                                    selectedImage.split("/").pop() || ""
-                                ] || "A moment I’ll always cherish ❤️"}
-                            </p>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </section>
-    );
-};
-
-export default MemoryGallery;
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
