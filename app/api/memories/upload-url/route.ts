@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import {
-  BLOG_ADMIN_SESSION_COOKIE,
-  verifyBlogAdminSession,
-} from "@/lib/blogAuth";
+import { checkRateLimit } from "@/lib/blogAuth";
 import { isDatabaseConfigured } from "@/lib/db";
 import {
   createMemoryStorageClient,
   getMemoryStorageConfig,
-  hasSecureMemoryAdminConfiguration,
   MAX_MEMORY_IMAGE_BYTES,
   MEMORY_IMAGE_TYPES,
 } from "@/lib/memoryStorage";
@@ -16,22 +12,22 @@ import {
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  if (!hasSecureMemoryAdminConfiguration()) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Configure BLOG_ADMIN_PASSWORD_HASH and BLOG_ADMIN_SESSION_SECRET before enabling memory uploads in production.",
-      },
-      { status: 503 },
-    );
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || request.headers.get("host");
+  if (origin) {
+    try {
+      if (!host || new URL(origin).host.toLowerCase() !== host.toLowerCase()) {
+        return NextResponse.json({ success: false, message: "Upload from this website only." }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ success: false, message: "Invalid request origin." }, { status: 403 });
+    }
   }
 
-  const adminToken = request.cookies.get(BLOG_ADMIN_SESSION_COOKIE)?.value;
-  if (!verifyBlogAdminSession(adminToken)) {
-    return NextResponse.json(
-      { success: false, message: "Author login is required to upload images." },
-      { status: 403 },
-    );
+  const ip = (request.headers.get("x-vercel-forwarded-for") || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown").split(",")[0].trim();
+  const limit = checkRateLimit("public-memory-upload:" + ip.slice(0, 120), 5, 10 * 60 * 1000);
+  if (!limit.allowed) {
+    return NextResponse.json({ success: false, message: "Too many upload attempts. Please try again in a few minutes." }, { status: 429 });
   }
 
   if (!isDatabaseConfigured()) {

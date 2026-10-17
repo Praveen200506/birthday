@@ -1,20 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, isDatabaseConfigured, withDbTimeout } from "@/lib/db";
-import {
-  BLOG_ADMIN_SESSION_COOKIE,
-  verifyBlogAdminSession,
-} from "@/lib/blogAuth";
+import { checkRateLimit } from "@/lib/blogAuth";
 import {
   createMemoryStorageClient,
   getMemoryStorageConfig,
-  hasSecureMemoryAdminConfiguration,
 } from "@/lib/memoryStorage";
 
 export const runtime = "nodejs";
 
-function canManageMemories(request: NextRequest): boolean {
-  const token = request.cookies.get(BLOG_ADMIN_SESSION_COOKIE)?.value;
-  return hasSecureMemoryAdminConfiguration() && verifyBlogAdminSession(token);
+function checkPublicSubmission(request: NextRequest): NextResponse | null {
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || request.headers.get("host");
+  if (origin) {
+    try {
+      if (!host || new URL(origin).host.toLowerCase() !== host.toLowerCase()) {
+        return NextResponse.json({ success: false, message: "Submit memories from this website only." }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ success: false, message: "Invalid request origin." }, { status: 403 });
+    }
+  }
+  const ip = (request.headers.get("x-vercel-forwarded-for") || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown").split(",")[0].trim();
+  const limit = checkRateLimit("public-memory:" + ip.slice(0, 120), 5, 10 * 60 * 1000);
+  if (!limit.allowed) return NextResponse.json({ success: false, message: "Too many submissions. Please try again in a few minutes." }, { status: 429 });
+  return null;
 }
 
 export async function GET() {
@@ -54,22 +63,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!hasSecureMemoryAdminConfiguration()) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Configure BLOG_ADMIN_PASSWORD_HASH and BLOG_ADMIN_SESSION_SECRET before enabling memory uploads in production.",
-      },
-      { status: 503 },
-    );
-  }
-
-  if (!canManageMemories(request)) {
-    return NextResponse.json(
-      { success: false, message: "Author login is required to add memories." },
-      { status: 403 },
-    );
-  }
+  const blocked = checkPublicSubmission(request);
+  if (blocked) return blocked;
 
   if (!isDatabaseConfigured()) {
     return NextResponse.json(

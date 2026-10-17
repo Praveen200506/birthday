@@ -34,8 +34,6 @@ export default function MemoryGallery() {
   const [rotations, setRotations] = useState<number[]>([]);
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authChecking, setAuthChecking] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
@@ -65,20 +63,7 @@ export default function MemoryGallery() {
       }
     }
 
-    async function checkAuthorSession() {
-      try {
-        const response = await fetch("/api/blog/auth/admin", { cache: "no-store" });
-        const data = await response.json();
-        if (!cancelled) setIsAdmin(Boolean(response.ok && data.authenticated));
-      } catch {
-        if (!cancelled) setIsAdmin(false);
-      } finally {
-        if (!cancelled) setAuthChecking(false);
-      }
-    }
-
     void loadMemories();
-    void checkAuthorSession();
     return () => {
       cancelled = true;
     };
@@ -112,10 +97,6 @@ export default function MemoryGallery() {
     event.preventDefault();
     if (submitting) return;
 
-    if (!isAdmin) {
-      setError("Sign in through the author portal before adding memories.");
-      return;
-    }
     if (!title.trim()) {
       setError("Give this memory a title.");
       return;
@@ -235,26 +216,24 @@ export default function MemoryGallery() {
             </button>
           )}
 
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => {
-                setError(null);
-                setNotice(null);
-                setShowUploader((current) => !current);
-              }}
-              className="inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-200 transition hover:-translate-y-0.5 hover:bg-pink-400"
-            >
-              {showUploader ? <X size={16} /> : <Plus size={17} />}
-              {showUploader ? "Close uploader" : "Add a memory"}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setNotice(null);
+              setShowUploader((current) => !current);
+            }}
+            className="inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-200 transition hover:-translate-y-0.5 hover:bg-pink-400"
+          >
+            {showUploader ? <X size={16} /> : <Plus size={17} />}
+            {showUploader ? "Close uploader" : "Add a memory"}
+          </button>
         </div>
       </motion.header>
 
       <div className="mx-auto max-w-2xl">
         <AnimatePresence>
-          {showUploader && isAdmin && (
+          {showUploader && (
             <motion.form
               onSubmit={handleUpload}
               initial={{ opacity: 0, y: 16, height: 0 }}
@@ -394,15 +373,13 @@ export default function MemoryGallery() {
           <p className="max-w-sm text-sm leading-6 text-stone-500">
             No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.
           </p>
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => setShowUploader(true)}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400"
-            >
-              <Plus size={17} /> Add the first memory
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setShowUploader(true)}
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400"
+          >
+            <Plus size={17} /> Add the first memory
+          </button>
         </motion.div>
       ) : (
         <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-4 pb-12 sm:gap-8">
