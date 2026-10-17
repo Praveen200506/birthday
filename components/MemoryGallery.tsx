@@ -2,7 +2,6 @@
 
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -10,7 +9,6 @@ import {
   ImagePlus,
   Images,
   LoaderCircle,
-  LockKeyhole,
   Plus,
   Shuffle,
   Sparkles,
@@ -237,7 +235,7 @@ export default function MemoryGallery() {
             </button>
           )}
 
-          {isAdmin ? (
+          {isAdmin && (
             <button
               type="button"
               onClick={() => {
@@ -250,14 +248,7 @@ export default function MemoryGallery() {
               {showUploader ? <X size={16} /> : <Plus size={17} />}
               {showUploader ? "Close uploader" : "Add a memory"}
             </button>
-          ) : !authChecking ? (
-            <Link
-              href="/blog/write/login"
-              className="inline-flex items-center gap-2 rounded-full border border-white bg-white/90 px-5 py-3 text-sm text-stone-600 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <LockKeyhole size={16} /> Author login to add memories
-            </Link>
-          ) : null}
+          )}
         </div>
       </motion.header>
 
