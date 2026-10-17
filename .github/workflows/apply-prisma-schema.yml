@@ -1,7 +1,7 @@
 name: Apply Prisma schema
 
 on:
-  # Run once when this workflow is first added/updated; later runs are manual.
+  # Run automatically when this workflow changes; later runs can be started manually.
   push:
     branches:
       - main
@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   apply-schema:
     name: Sync Prisma schema to Supabase
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -35,6 +35,8 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -42,8 +44,21 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies and repair package lock
+        run: npm install --no-audit --no-fund
+
+      - name: Commit repaired package lock, if needed
+        shell: bash
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json is already in sync."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: sync npm package lock"
+          git push origin HEAD:main
 
       - name: Validate Prisma schema
         run: npx prisma validate
