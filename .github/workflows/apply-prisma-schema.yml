@@ -1,0 +1,52 @@
+name: Apply Prisma schema
+
+on:
+  # Run once when this workflow is first added/updated; later runs are manual.
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/apply-prisma-schema.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apply-schema:
+    name: Sync Prisma schema to Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+    steps:
+      - name: Check required database secrets
+        shell: bash
+        run: |
+          if [[ -z "$DATABASE_URL" ]]; then
+            echo "::error::Configure the DATABASE_URL repository secret to point to the intended Supabase database."
+            exit 1
+          fi
+          if [[ -z "$DIRECT_URL" ]]; then
+            echo "::error::Configure the DIRECT_URL repository secret to point to the same Supabase database, using a direct or session-pooler connection suitable for schema changes."
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Apply schema without forcing data loss
+        run: npx prisma db push --skip-generate
