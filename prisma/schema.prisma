@@ -24,3 +24,14 @@ model BlogPost {
 
   @@index([published, createdAt])
 }
+
+model Memory {
+  id         String   @id @default(cuid())
+  title      String   @db.VarChar(120)
+  caption    String   @default("") @db.Text
+  imageUrl   String   @db.Text
+  storagePath String  @unique
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
