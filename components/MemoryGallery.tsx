@@ -286,7 +286,7 @@ export default function MemoryGallery() {
 
                 <div>
                   <label htmlFor="memory-image" className="mb-1.5 block text-xs font-semibold text-stone-600">
-                    Memory image * <span className="font-normal text-stone-400">(JPG, PNG, WebP or GIF; up to 8 MB)</span>
+                    Memory image * <span className="font-normal text-stone-400">(JPG, PNG, WebP or GIF; up to 15 MB)</span>
                   </label>
                   <input
                     id="memory-image"
