@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
   if (!Number.isInteger(size) || size <= 0 || size > MAX_MEMORY_IMAGE_BYTES) {
     return NextResponse.json(
-      { success: false, message: "The image must be larger than 0 bytes and no more than 15 MB." },
+      { success: false, message: "The image must be larger than 0 bytes and no more than 8 MB." },
       { status: 413 },
     );
   }
