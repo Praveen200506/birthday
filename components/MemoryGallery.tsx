@@ -25,7 +25,7 @@ interface Memory {
   createdAt: string;
 }
 
-const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export default function MemoryGallery() {
@@ -110,7 +110,7 @@ export default function MemoryGallery() {
       return;
     }
     if (file.size <= 0 || file.size > MAX_IMAGE_SIZE) {
-      setError("Choose an image smaller than 8 MB.");
+      setError("Choose an image no larger than 15 MB.");
       return;
     }
 
