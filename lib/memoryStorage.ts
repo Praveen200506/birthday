@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-export const MAX_MEMORY_IMAGE_BYTES = 8 * 1024 * 1024;
+export const MAX_MEMORY_IMAGE_BYTES = 15 * 1024 * 1024;
 
 export const MEMORY_IMAGE_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
