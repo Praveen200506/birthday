@@ -170,7 +170,7 @@ The Memories page starts empty and now reads its memories from PostgreSQL. The a
    ```
    The `Memory` table must exist before uploads can be saved. Run these commands in an environment with the correct `DATABASE_URL`; do not add schema-push to the Vercel build command.
 4. Configure `BLOG_ADMIN_PASSWORD_HASH` and `BLOG_ADMIN_SESSION_SECRET` in production. The password hash can be generated with `node scripts/generate-pin-hash.mjs yourSecretPassword`; use a random session secret of at least 32 characters. Memory upload endpoints fail closed in production if these are not configured.
-5. Set the Storage bucket's maximum file size to **15 MB or less** and restrict allowed MIME types to `image/jpeg`, `image/png`, `image/webp`, and `image/gif`.
+5. Set the Storage bucket's maximum file size to **8 MB or less** and restrict allowed MIME types to `image/jpeg`, `image/png`, `image/webp`, and `image/gif`.
 
 ### Add a memory
 
