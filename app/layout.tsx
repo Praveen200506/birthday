@@ -18,19 +18,20 @@ const nunito = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Birthday Sharmila",
-  description: "A personal collection of photographs and memories.",
+  title: birthdayConfig.site.title,
+  description: birthdayConfig.site.description,
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#EAF0EE",
+  themeColor: birthdayConfig.site.themeColor,
 };
 
 import FinalScene from "@/components/FinalScene";
 import VisitorTracker from "@/components/VisitorTracker";
+import { birthdayConfig } from "@/data/birthdayConfig";
 import RoamingMascot from "@/components/RoamingMascot";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
