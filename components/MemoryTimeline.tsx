@@ -202,7 +202,7 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
                 </label>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-[#59434A]">Choose an existing photograph
-                    <select value={item.image.startsWith("http") ? "" : item.image} onChange={(event) => updateMilestone(item.id, { image: event.target.value })} className={inputClass}>
+                    <select value={item.image} onChange={(event) => updateMilestone(item.id, { image: event.target.value })} className={inputClass}>
                       <option value="">Use an uploaded photo / no existing photo</option>
                       {uploadedMemories.map((memory) => <option key={memory.id} value={memory.imageUrl}>{memory.title || "Uploaded memory"}</option>)}
                       {images.map((src) => <option key={src} value={src}>{src.split("/").pop()}</option>)}
