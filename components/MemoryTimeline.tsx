@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { CalendarDays, ImagePlus, LoaderCircle, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
 type Milestone = {
   id: string;
@@ -16,11 +17,7 @@ type Milestone = {
 const STORAGE_KEY = "sharmila-birthday-milestones-v1";
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
 type SavedMemory = { id: string; title: string; caption: string; imageUrl: string; createdAt: string };
-const placeholders: Milestone[] = [
-  { id: "placeholder-1", date: "", title: "A moment worth keeping", description: "Replace this with the story behind a favourite memory.", image: "" },
-  { id: "placeholder-2", date: "", title: "One of our favourite days", description: "Add what happened, why it mattered, and the little details you remember.", image: "" },
-  { id: "placeholder-3", date: "", title: "A memory to come back to", description: "Write a personal note here and choose the photograph that belongs with it.", image: "" },
-];
+const placeholders: Milestone[] = birthdayConfig.timeline.placeholders.map((item) => ({ ...item }));
 const inputClass = "mt-1.5 w-full rounded-xl border border-[#D8B8B4] bg-white px-3 py-2.5 text-sm text-[#38252E] outline-none transition focus:border-[#9B3D5B] focus:ring-2 focus:ring-[#9B3D5B]/20";
 
 function makeId() {
@@ -165,13 +162,13 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
       <div className="mb-9 flex flex-wrap items-end justify-between gap-5 border-t border-[#9B3D5B]/25 pt-6">
         <div>
           <p className="text-sm font-bold text-[#A43F60]">Written by us, not by a camera roll</p>
-          <h2 id="timeline-heading" className="mt-2 font-display text-4xl leading-tight tracking-tight text-[#38252E] sm:text-5xl">The little things we remember</h2>
-          <p className="mt-3 max-w-xl text-sm leading-7 text-[#59434A]">A place for the dates, stories, and photographs that mean something.</p>
+          <h2 id="timeline-heading" className="mt-2 font-display text-4xl leading-tight tracking-tight text-[#38252E] sm:text-5xl">{birthdayConfig.timeline.heading}</h2>
+          <p className="mt-3 max-w-xl text-sm leading-7 text-[#59434A]">{birthdayConfig.timeline.intro}</p>
         </div>
         <button type="button" onClick={() => setEditing((value) => !value)} aria-expanded={editing}
           className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#9B3D5B] bg-white px-5 py-2.5 text-sm font-bold text-[#8B294B] shadow-sm transition hover:bg-[#8B294B] hover:text-white hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]">
           {editing ? <X size={16} /> : <Pencil size={16} />}
-          {editing ? "Close editor" : "Edit memories"}
+          {editing ? "Close editor" : birthdayConfig.timeline.editLabel}
         </button>
       </div>
 
