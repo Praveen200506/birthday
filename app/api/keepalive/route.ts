@@ -16,6 +16,14 @@ export const maxDuration = 10;
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET?.trim();
 
+  if (!cronSecret && process.env.NODE_ENV === "production") {
+    console.error("Supabase keep-alive unavailable: CRON_SECRET is not configured.");
+    return NextResponse.json(
+      { ok: false, message: "The scheduled database check is not configured." },
+      { status: 503 },
+    );
+  }
+
   if (cronSecret && request.headers.get("authorization") !== "Bearer " + cronSecret) {
     return NextResponse.json(
       { ok: false, message: "Unauthorized cron request." },
