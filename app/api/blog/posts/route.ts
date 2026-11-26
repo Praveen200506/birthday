@@ -84,16 +84,12 @@ export async function GET(req: NextRequest) {
 
 // POST /api/blog/posts - Create post (Anyone with Blog PIN / access)
 export async function POST(req: NextRequest) {
-  const readerToken = req.cookies.get(BLOG_SESSION_COOKIE)?.value;
   const adminToken = req.cookies.get(BLOG_ADMIN_SESSION_COOKIE)?.value;
 
-  const isReader = verifyBlogReaderSession(readerToken);
-  const isAdmin = verifyBlogAdminSession(adminToken);
-
-  if (!isReader && !isAdmin) {
+  if (!verifyBlogAdminSession(adminToken)) {
     return NextResponse.json(
-      { success: false, message: "Blog PIN authentication required to write stories.", locked: true },
-      { status: 401 }
+      { success: false, message: "Author privileges are required to publish journal stories." },
+      { status: 403 }
     );
   }
 

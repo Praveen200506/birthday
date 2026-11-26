@@ -1,86 +1,52 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
-
-type KeepAliveResponse = {
-  ok: boolean;
-  message: string;
-};
-
-type SupabaseConfig = {
-  url: string;
-  anonKey: string;
-};
+import { NextRequest, NextResponse } from "next/server";
+import { isDatabaseConfigured, prisma, withDbTimeout } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 10;
 
-function getSupabaseConfig(): SupabaseConfig | null {
-  const url = process.env.SUPABASE_URL?.trim();
-  const anonKey = process.env.SUPABASE_ANON_KEY?.trim();
+/**
+ * Vercel invokes this route once per day. The query deliberately reads a real
+ * application table; a constant-only RPC or SELECT 1 is not a useful signal of
+ * application database activity.
+ *
+ * Set CRON_SECRET in Vercel to make scheduled invocations require the
+ * Authorization: Bearer <CRON_SECRET> header automatically sent by Vercel.
+ */
+export async function GET(request: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET?.trim();
 
-  if (!url || !anonKey) {
-    return null;
+  if (cronSecret && request.headers.get("authorization") !== "Bearer " + cronSecret) {
+    return NextResponse.json(
+      { ok: false, message: "Unauthorized cron request." },
+      { status: 401 },
+    );
   }
 
-  return { url, anonKey };
-}
-
-function createSupabaseClient(config: SupabaseConfig): SupabaseClient {
-  return createClient(config.url, config.anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
-}
-
-export async function GET(): Promise<NextResponse<KeepAliveResponse>> {
-  const config = getSupabaseConfig();
-
-  if (!config) {
-    console.error(
-      "Keep-alive configuration error: SUPABASE_URL and SUPABASE_ANON_KEY must be set.",
-    );
+  if (!isDatabaseConfigured()) {
+    console.error("Supabase keep-alive skipped: DATABASE_URL is not configured.");
     return NextResponse.json(
-      { ok: false, message: "Supabase environment variables are not configured." },
-      { status: 500 },
+      { ok: false, message: "The database connection is not configured." },
+      { status: 503 },
     );
   }
 
   try {
-    const supabase = createSupabaseClient(config);
-    const { error: rpcError } = await supabase.rpc("keep_alive");
+    await withDbTimeout(
+      prisma.$queryRaw<Array<{ id: string }>>`SELECT "id" FROM "BlogPost" LIMIT 1`,
+      8000,
+      "Supabase database keep-alive query timed out",
+    );
 
-    if (!rpcError) {
-      return NextResponse.json({ ok: true, message: "Supabase is active." });
-    }
-
-    // The RPC is preferred. The fallback keeps this endpoint useful before the
-    // optional SQL function has been created, using the app's existing table.
-    const { error: selectError } = await supabase
-      .from("BlogPost")
-      .select("id")
-      .limit(1);
-
-    if (selectError) {
-      console.error("Supabase keep-alive failed:", {
-        rpcCode: rpcError.code,
-        rpcMessage: rpcError.message,
-        selectCode: selectError.code,
-        selectMessage: selectError.message,
-      });
-      return NextResponse.json(
-        { ok: false, message: "Supabase keep-alive operation failed." },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json({ ok: true, message: "Supabase is active." });
+    return NextResponse.json({
+      ok: true,
+      message: "A real application-table query completed successfully.",
+      checkedAt: new Date().toISOString(),
+    });
   } catch (error: unknown) {
-    console.error("Unexpected Supabase keep-alive error:", error);
+    console.error("Supabase keep-alive database query failed:", error);
     return NextResponse.json(
-      { ok: false, message: "Unable to reach Supabase." },
+      { ok: false, message: "Unable to complete the Supabase database keep-alive query." },
       { status: 502 },
     );
   }

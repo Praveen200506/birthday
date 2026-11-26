@@ -122,3 +122,21 @@
   animation: floatUp linear infinite;
   will-change: transform, opacity;
 }
+
+.hero-paper {
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(255, 219, 226, 0.48), transparent 34%),
+    radial-gradient(ellipse at 88% 78%, rgba(229, 220, 255, 0.42), transparent 38%),
+    linear-gradient(135deg, #fffaf6 0%, #fff6f7 48%, #fffaf7 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

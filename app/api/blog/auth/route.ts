@@ -14,6 +14,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!process.env.BLOG_PIN_HASH?.trim() || (process.env.BLOG_SESSION_SECRET?.trim().length || 0) < 32) {
+    return NextResponse.json(
+      { success: false, message: "Journal authentication is not configured on the server." },
+      { status: 503 },
+    );
+  }
+
   const ip = req.headers.get("x-forwarded-for") || "local";
   const { allowed, remaining } = checkRateLimit(`pin_${ip}`, 5, 60000);
 
