@@ -38,9 +38,9 @@ export const birthdayConfig = {
     heading: "The little things we remember",
     intro: "A place for the dates, stories, and photographs that mean something.",
     placeholders: [
-      { id: "memory-3", date: "2025-10-01", title: "Memory 3", description: "A little moment worth keeping." },
-      { id: "memory-1", date: "2026-01-01", title: "Memory 1", description: "A little moment worth keeping." },
-      { id: "memory-2", date: "2026-05-01", title: "Memory 2", description: "A little moment worth keeping." },
+      { id: "memory-3", date: "2025-10-01", title: "Memory 3", description: "A little moment worth keeping.", image: "" },
+      { id: "memory-1", date: "2026-01-01", title: "Memory 1", description: "A little moment worth keeping.", image: "" },
+      { id: "memory-2", date: "2026-05-01", title: "Memory 2", description: "A little moment worth keeping.", image: "" },
     ],
   },
   letter: {
