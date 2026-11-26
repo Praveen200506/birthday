@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -115,66 +114,26 @@ export default function MemoryGallery() {
       return;
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setError("Supabase public URL and anon key are missing from the app environment.");
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
     setNotice(null);
 
     try {
-      const signedResponse = await fetch("/api/memories/upload-url", {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("title", title.trim());
+      formData.set("caption", caption.trim());
+      const uploadResponse = await fetch("/api/memories/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          size: file.size,
-        }),
+        body: formData,
       });
-      const signedData = await signedResponse.json();
-      if (!signedResponse.ok || !signedData.success) {
-        throw new Error(signedData.message || "Could not prepare the image upload.");
+      const uploadData = await uploadResponse.json();
+      if (!uploadResponse.ok || !uploadData.success || !uploadData.memory?.imageUrl) {
+        throw new Error(uploadData.message || "Could not upload this memory.");
       }
+      const savedMemory = uploadData.memory as Memory;
 
-      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-        },
-      });
-      const { error: uploadError } = await supabase.storage
-        .from(signedData.bucket)
-        .uploadToSignedUrl(signedData.path, signedData.token, file, {
-          contentType: file.type,
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw new Error("Supabase upload failed: " + uploadError.message);
-      }
-
-      const saveResponse = await fetch("/api/memories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim(),
-          caption: caption.trim(),
-          storagePath: signedData.path,
-        }),
-      });
-      const saveData = await saveResponse.json();
-      if (!saveResponse.ok || !saveData.success) {
-        throw new Error(saveData.message || "The image uploaded, but the memory could not be saved.");
-      }
-
-      setMemories((current) => [saveData.memory, ...current]);
+      setMemories((current) => [savedMemory, ...current]);
       closeComposer();
       setNotice("Your new memory has been added. ❤️");
     } catch (uploadFailure) {
@@ -401,6 +360,7 @@ export default function MemoryGallery() {
               <div className="relative h-full rounded-sm bg-white p-2 pb-4 shadow-md transition-shadow duration-300 group-hover:shadow-xl sm:p-3 sm:pb-6">
                 <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-stone-100">
                   <Image
+                    unoptimized
                     src={memory.imageUrl}
                     alt={memory.title}
                     fill
@@ -450,6 +410,7 @@ export default function MemoryGallery() {
               </button>
               <div className="relative mx-auto max-h-[68vh] min-h-48 w-full overflow-hidden rounded-2xl bg-stone-100 sm:max-h-[72vh]">
                 <Image
+                  unoptimized
                   src={selectedMemory.imageUrl}
                   alt={selectedMemory.title}
                   width={1600}
