@@ -20,7 +20,14 @@ export default function HeroSection({ images }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="min-h-screen overflow-hidden bg-mist text-ink">
+    <div className="relative min-h-screen overflow-hidden bg-mist text-ink">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[760px] overflow-hidden">
+        <span className="birthday-drift absolute -left-10 top-24 h-36 w-36 rounded-full bg-[#F3A5A2]/35 blur-2xl" />
+        <span className="birthday-drift absolute right-[8%] top-16 h-44 w-44 rounded-full bg-[#F7C77D]/35 blur-3xl" />
+        <span className="birthday-twinkle absolute left-[44%] top-36 h-3 w-3 rotate-45 bg-[#D65A7D]/70" />
+        <span className="birthday-twinkle absolute right-[17%] top-[390px] h-2.5 w-2.5 rotate-45 bg-[#C18B45]/80" />
+        <span className="birthday-drift absolute left-[12%] top-[520px] h-5 w-5 rounded-full border-2 border-[#D65A7D]/40" />
+      </div>
       <motion.section
         id="home"
         initial={reduceMotion ? false : { opacity: 0, y: 14 }}
