@@ -1,4 +1,14 @@
+/**
+ * Single source of truth for the birthday experience.
+ * Update the copy, navigation, theme, timeline placeholders, and companion here.
+ */
 export const birthdayConfig = {
+  site: {
+    title: "Happy Birthday Sharmila",
+    description: "A little world of photographs, stories, music, and memories made for Sharmila.",
+    themeColor: "#FFF0E9",
+    maxPhotoUploadMb: 15,
+  },
   person: {
     name: "Sharmila",
     greeting: "Happy Birthday, Sharmila.",
@@ -21,15 +31,36 @@ export const birthdayConfig = {
     galleryDescription: "A few frames, a hundred little details, and stories still being written.",
     photoCta: "Explore the photographs",
     letterCta: "Read the letter",
+    timelineCta: "Read the memories",
+    photoModalLabel: "A moment worth keeping",
   },
   timeline: {
     heading: "The little things we remember",
     intro: "A place for the dates, stories, and photographs that mean something.",
+    editLabel: "Edit memories",
     placeholders: [
       { id: "placeholder-1", date: "", title: "A moment worth keeping", description: "Replace this with the story behind a favourite memory.", image: "" },
       { id: "placeholder-2", date: "", title: "One of our favourite days", description: "Add what happened, why it mattered, and the little details you remember.", image: "" },
       { id: "placeholder-3", date: "", title: "A memory to come back to", description: "Write a personal note here and choose the photograph that belongs with it.", image: "" },
     ],
+  },
+  mascot: {
+    label: "Birthday buddy",
+    ariaLabel: "Open the birthday companion",
+    messages: [
+      "Psst… there are more memories waiting to be explored.",
+      "A little wish can make a big day even brighter.",
+      "Have you read the birthday letter yet?",
+      "Tap a photograph. Every frame has a story.",
+    ],
+    hint: "Need a hint? Tap me.",
+    enabled: true,
+  },
+  motion: {
+    ambient: true,
+    floatingCompanion: true,
+    photoReveal: true,
+    confetti: true,
   },
   surprise: {
     eyebrow: "A little birthday ritual",
