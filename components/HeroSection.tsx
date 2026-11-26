@@ -20,8 +20,8 @@ export default function HeroSection({ images }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-mist text-ink">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[760px] overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-transparent text-ink">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[760px] overflow-hidden">
         <span className="birthday-drift absolute -left-10 top-24 h-36 w-36 rounded-full bg-[#F3A5A2]/35 blur-2xl" />
         <span className="birthday-drift absolute right-[8%] top-16 h-44 w-44 rounded-full bg-[#F7C77D]/35 blur-3xl" />
         <span className="birthday-twinkle absolute left-[44%] top-36 h-3 w-3 rotate-45 bg-[#D65A7D]/70" />
@@ -33,7 +33,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
         initial={reduceMotion ? false : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="mx-auto grid min-h-[76svh] w-full max-w-7xl content-center gap-9 px-5 pb-14 pt-14 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:px-12 lg:pb-20 lg:pt-20"
+        className="relative z-10 mx-auto grid min-h-[76svh] w-full max-w-7xl content-center gap-9 px-5 pb-14 pt-14 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:px-12 lg:pb-20 lg:pt-20"
       >
         <div className="flex flex-col items-start justify-center">
           <p className="mb-5 text-sm font-semibold text-berry">
@@ -94,7 +94,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
       <section
         id="photographs"
         aria-labelledby="photographs-heading"
-        className="mx-auto w-full max-w-7xl scroll-mt-8 px-5 pb-32 sm:px-8 lg:px-12"
+        className="relative z-10 mx-auto w-full max-w-7xl scroll-mt-8 px-5 pb-32 sm:px-8 lg:px-12"
       >
         <div className="mb-8 flex flex-col justify-between gap-3 border-t border-ink/20 pt-6 sm:flex-row sm:items-end">
           <div>
