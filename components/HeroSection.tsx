@@ -76,7 +76,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
         </aside>
       </motion.section>
 
-      <MemoryTimeline images={images} />
+      <MemoryTimeline />
 
       <section id="photographs" aria-labelledby="photographs-heading" className="relative z-10 mx-auto w-full max-w-[1720px] scroll-mt-8 px-5 pb-36 sm:px-9 lg:px-16">
         <div className="mb-8 flex flex-col justify-between gap-4 border-t border-ink/20 pt-6 sm:flex-row sm:items-end">
