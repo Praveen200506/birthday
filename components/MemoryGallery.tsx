@@ -410,12 +410,10 @@ export default function MemoryGallery() {
               </button>
               <div className="relative mx-auto max-h-[68vh] min-h-48 w-full overflow-hidden rounded-2xl bg-stone-100 sm:max-h-[72vh]">
                 <Image
-                  unoptimized
                   src={selectedMemory.imageUrl}
                   alt={selectedMemory.title}
                   width={1600}
                   height={1200}
-                  unoptimized
                   className="mx-auto max-h-[68vh] w-auto max-w-full object-contain sm:max-h-[72vh]"
                 />
               </div>
