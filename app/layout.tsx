@@ -1,34 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Dancing_Script, Nunito } from "next/font/google";
+import { Bodoni_Moda, Nunito_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import AudioPlayer from "@/components/AudioPlayer";
 import GlobalLockWrapper from "@/components/GlobalLockWrapper";
 import "./globals.css";
 
-const dancingScript = Dancing_Script({
-  variable: "--font-dancing",
+const bodoni = Bodoni_Moda({
+  variable: "--font-bodoni",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const nunito = Nunito({
+const nunito = Nunito_Sans({
   variable: "--font-nunito",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Happy Birthday Sharmila! 🎉",
-  description: "A little digital gift for you.",
+  title: "Happy Birthday Sharmila",
+  description: "A personal collection of photographs and memories.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#FFF9F0",
+  themeColor: "#EAF0EE",
 };
 
-import FloatingParticles from "@/components/FloatingParticles";
-import CursorTrail from "@/components/CursorTrail";
 import FinalScene from "@/components/FinalScene";
 import VisitorTracker from "@/components/VisitorTracker";
 import { Analytics } from "@vercel/analytics/react";
@@ -42,18 +42,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full w-full overflow-x-hidden">
       <body
-        className={`${dancingScript.variable} ${nunito.variable} antialiased font-sans bg-warm-cream relative min-h-[100dvh] w-full max-w-full overflow-x-hidden`}
+        className={`${bodoni.variable} ${nunito.variable} min-h-[100dvh] w-full max-w-full overflow-x-hidden font-sans antialiased`}
       >
         <VisitorTracker />
         <Analytics />
         <SpeedInsights />
 
         <GlobalLockWrapper>
-          <FloatingParticles />
-          <CursorTrail />
           <FinalScene />
           <AudioPlayer />
-          <main className="relative w-full min-h-[100dvh]">
+          <main className="relative min-h-[100dvh] w-full">
             {children}
           </main>
           <Navbar />
