@@ -137,7 +137,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
             {timeline.map((moment, index) => (
               <a
                 key={moment.key}
-                href="#photographs"
+                href={`#photo-${moment.key}`}
                 className="group relative grid grid-cols-[24px_1fr] gap-4 pl-0 sm:grid-cols-1 sm:gap-5 sm:pl-0"
               >
                 <span className="relative z-10 mt-1.5 ml-0.5 h-3.5 w-3.5 rounded-full border-[3px] border-mist bg-berry ring-1 ring-berry sm:ml-0 sm:mt-0" />
@@ -195,6 +195,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
           <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4">
             {images.map((src, index) => {
               const ratio = index % 5 === 0 ? "aspect-[5/4]" : index % 4 === 2 ? "aspect-[3/4]" : "aspect-[4/5]";
+              const timelineMoment = timeline.find((moment) => moment.photos[0] === src);
               return (
                 <figure
                   key={src}
