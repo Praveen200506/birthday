@@ -78,7 +78,7 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
                         aria-label={isOn ? "Blow out candle " + (i + 1) : "Candle " + (i + 1) + " is blown out"}
                         aria-pressed={!isOn}
                         aria-disabled={!isOn}
-                        className="relative cursor-pointer rounded-md bg-transparent p-1 outline-none focus-visible:ring-2 focus-visible:ring-[#8B294B] focus-visible:ring-offset-4 disabled:cursor-default"
+                        className={"relative rounded-md bg-transparent p-1 outline-none focus-visible:ring-2 focus-visible:ring-[#8B294B] focus-visible:ring-offset-4 " + (isOn ? "cursor-pointer" : "cursor-default opacity-80")}
                         onClick={() => isOn && blowCandle(i)}
                         onKeyDown={(event) => {
                             if (isOn && (event.key === "Enter" || event.key === " ")) {
