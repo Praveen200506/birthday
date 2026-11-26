@@ -10,6 +10,7 @@ export default function RoamingMascot() {
   const reduceMotion = useReducedMotion();
   const mascot = birthdayConfig.mascot;
   if (!mascot.enabled) return null;
+  // Cycle through configured hints with state; never choose random content during render.
   const nextHint = () => setMessageIndex((index) => index === null ? 0 : (index + 1) % mascot.messages.length);
 
   return (
