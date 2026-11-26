@@ -194,7 +194,7 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
                   {item.image && (
                     <div className="mt-3 flex items-center gap-3 rounded-xl bg-[#FFF5F0] p-2">
                       <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-[#F4E5DF]">
-                        <Image src={item.image.startsWith("http") ? item.image : "/" + item.image.replace(/^\/+/, "")} alt="Selected memory preview" fill sizes="80px" className="object-contain" />
+                        <Image unoptimized src={item.image.startsWith("http") ? item.image : "/" + item.image.replace(/^\/+/, "")} alt="Selected memory preview" fill sizes="80px" className="object-contain" />
                       </div>
                       <span className="min-w-0 break-all text-xs text-[#59434A]">{item.image.split("/").pop()}</span>
                       <button type="button" onClick={() => updateMilestone(item.id, { image: "" })} className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-xs font-bold text-[#8B294B] hover:bg-[#F9E2E1]" aria-label="Remove selected photo"><X size={14} /> Remove</button>
