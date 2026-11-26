@@ -1,55 +1,136 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { birthdayConfig } from "@/data/birthdayConfig";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
+
+const PET_WIDTH = 116;
+const PET_HEIGHT = 226;
 
 export default function RoamingMascot() {
   const [messageIndex, setMessageIndex] = useState<number | null>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [ready, setReady] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const dragOffset = useRef({ x: 0, y: 0 });
   const reduceMotion = useReducedMotion();
   const mascot = birthdayConfig.mascot;
+
+  useEffect(() => {
+    const place = () => {
+      setPosition((current) => ({
+        x: Math.min(Math.max(current.x || window.innerWidth - PET_WIDTH - 24, 8), window.innerWidth - PET_WIDTH - 8),
+        y: Math.min(Math.max(current.y || window.innerHeight * 0.48, 8), window.innerHeight - PET_HEIGHT - 12),
+      }));
+      setReady(true);
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, []);
+
+  const moveTo = useCallback((clientX: number, clientY: number) => {
+    setPosition({
+      x: Math.min(Math.max(clientX - dragOffset.current.x, 8), window.innerWidth - PET_WIDTH - 8),
+      y: Math.min(Math.max(clientY - dragOffset.current.y, 8), window.innerHeight - PET_HEIGHT - 12),
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!dragging) return;
+    const move = (event: PointerEvent) => moveTo(event.clientX, event.clientY);
+    const stop = () => setDragging(false);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    document.body.style.userSelect = "none";
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      document.body.style.userSelect = "";
+    };
+  }, [dragging, moveTo]);
+
   if (!mascot.enabled) return null;
-  // Cycle through configured hints with state; never choose random content during render.
+
   const nextHint = () => setMessageIndex((index) => index === null ? 0 : (index + 1) % mascot.messages.length);
+  const startDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if ((event.target as HTMLElement).closest("[data-pet-close]")) return;
+    dragOffset.current = { x: event.clientX - position.x, y: event.clientY - position.y };
+    setDragging(true);
+  };
 
   return (
-    <motion.div
-      className="pointer-events-none fixed right-2 top-[36%] z-[45] hidden sm:block md:right-5"
-      animate={reduceMotion ? undefined : { y: [0, -17, 7, -11, 0], x: [0, -7, 4, 0], rotate: [0, 2, -1, 0] }}
-      transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+    <div
+      className="pointer-events-none fixed inset-0 z-[70] hidden sm:block"
+      aria-label="Interactive birthday companion"
     >
-      <button type="button" onClick={nextHint}
-        aria-label={mascot.ariaLabel}
-        aria-expanded={messageIndex !== null}
-        className="pointer-events-auto group relative flex flex-col items-center rounded-full p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]">
-        <AnimatePresence mode="wait">
-          {messageIndex !== null && <motion.span key={messageIndex}
-            initial={{ opacity: 0, y: 10, scale: .92 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: .96 }}
-            className="absolute bottom-full right-0 mb-3 w-56 rounded-2xl border border-[#E7B7B4] bg-[#FFF9F4] p-3 text-left text-xs leading-5 text-[#59313F] shadow-[0_16px_45px_rgba(54,26,39,.22)]">
-            {mascot.messages[messageIndex]}
-            <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-[#A43F60]">Tap for another little hint</span>
-          </motion.span>}
-        </AnimatePresence>
-        <motion.span whileHover={reduceMotion ? undefined : { scale: 1.07, rotate: -4 }} className="relative block h-[142px] w-[96px] [perspective:700px] sm:h-[164px] sm:w-[112px]">
-          <span className="absolute bottom-1 left-1/2 h-3 w-14 -translate-x-1/2 rounded-[50%] bg-[#6C3B50]/20 blur-md"/>
-          <span className="absolute inset-x-3 bottom-2 top-7 rounded-[48%_48%_35%_35%] border border-white/70 bg-gradient-to-br from-[#F9C6CD] via-[#E985A0] to-[#8B294B] shadow-[inset_-8px_-8px_14px_rgba(76,25,49,.25),inset_5px_5px_12px_rgba(255,255,255,.55),0_14px_18px_rgba(69,30,49,.24)] [transform:rotateY(-12deg)]"/>
-          <span className="absolute left-1/2 top-1 h-[76px] w-[67px] -translate-x-1/2 rounded-[48%_48%_45%_45%] border border-[#B87968]/40 bg-gradient-to-br from-[#FFE1C9] via-[#EFC0A7] to-[#BD806D] shadow-[inset_-7px_-5px_10px_rgba(112,57,49,.16),inset_4px_4px_9px_rgba(255,255,255,.7),0_8px_12px_rgba(62,32,43,.2)]"/>
-          <span className="absolute left-[19px] top-0 h-[79px] w-[74px] rounded-[48%_48%_40%_40%] bg-gradient-to-br from-[#4D3540] via-[#241923] to-[#100C12] shadow-[inset_-8px_-3px_9px_rgba(0,0,0,.6),inset_4px_3px_7px_rgba(255,255,255,.16)]"/>
-          <span className="absolute left-[17px] top-[37px] h-[66px] w-[22px] rounded-[50%] bg-gradient-to-r from-[#1B121A] to-[#59404B] shadow-md"/>
-          <span className="absolute right-[16px] top-[36px] h-[68px] w-[21px] rounded-[50%] bg-gradient-to-r from-[#59404B] to-[#1B121A] shadow-md"/>
-          <span className="absolute left-[35px] top-[51px] h-1.5 w-1.5 rounded-full bg-[#38252E] shadow-[12px_0_0_#38252E]"/>
-          <span className="absolute left-[43px] top-[67px] h-2 w-4 rounded-b-full border-b-2 border-[#A84B61]"/>
-          <span className="absolute left-[30px] top-[63px] h-2.5 w-3 rounded-full bg-[#E98591]/55 blur-[2px]"/>
-          <span className="absolute right-[29px] top-[63px] h-2.5 w-3 rounded-full bg-[#E98591]/55 blur-[2px]"/>
-          <span className="absolute left-[42px] top-[5px] h-5 w-8 rotate-[-12deg] rounded-full border-t-[5px] border-[#E9B85E]"/>
-          <span className="absolute left-[55px] top-[1px] h-3 w-3 rotate-45 rounded-sm bg-gradient-to-br from-[#FFF0B9] to-[#C18B45] shadow-md"/>
-          <span className="absolute left-[7px] top-[91px] h-8 w-4 rotate-[-35deg] rounded-full border border-[#D77B91] bg-gradient-to-b from-[#F6C6C8] to-[#A64264] shadow-md"/>
-          <span className="absolute right-[5px] top-[91px] h-8 w-4 rotate-[35deg] rounded-full border border-[#D77B91] bg-gradient-to-b from-[#F6C6C8] to-[#A64264] shadow-md"/>
-          <Sparkles className="absolute right-0 top-8 h-4 w-4 text-[#C18B45] drop-shadow" />
-        </motion.span>
-        <span className="mt-1 flex items-center gap-1 rounded-full border border-white/90 bg-[#FFF9F4]/95 px-3 py-1.5 text-[10px] font-extrabold text-[#8B294B] shadow-[0_6px_20px_rgba(69,30,49,.16)]"><Sparkles size={11}/>{mascot.label}</span>
-      </button>
-    </motion.div>
+      {ready && (
+        <motion.div
+          className="pointer-events-auto absolute touch-none"
+          style={{ left: 0, top: 0, x: position.x, y: position.y, width: PET_WIDTH }}
+          animate={dragging || reduceMotion ? undefined : { y: [position.y, position.y - 12, position.y + 5, position.y] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          onPointerMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width - 0.5;
+            const py = (event.clientY - rect.top) / rect.height - 0.5;
+            setTilt({ x: Math.max(-7, Math.min(7, -py * 12)), y: Math.max(-9, Math.min(9, px * 16)) });
+          }}
+          onPointerLeave={() => setTilt({ x: 0, y: 0 })}
+        >
+          <AnimatePresence>
+            {messageIndex !== null && (
+              <motion.div
+                key={messageIndex}
+                initial={{ opacity: 0, y: 10, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                className="absolute bottom-[calc(100%-8px)] right-0 mb-3 w-60 rounded-2xl border border-[#E7B7B4] bg-[#FFF9F4] p-3 text-left text-xs leading-5 text-[#59313F] shadow-[0_16px_45px_rgba(54,26,39,.22)]"
+              >
+                <button type="button" data-pet-close onClick={() => setMessageIndex(null)} aria-label="Close hint" className="absolute right-2 top-2 rounded-full p-1 text-[#8B294B] hover:bg-[#F8E5E3]"><X size={13} /></button>
+                <p className="pr-5">{mascot.messages[messageIndex]}</p>
+                <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-[#A43F60]">Tap me for another hint</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            type="button"
+            onPointerDown={startDrag}
+            onClick={() => { if (!dragging) nextHint(); }}
+            aria-label={mascot.ariaLabel + ". Drag to move, tap for a birthday hint."}
+            aria-expanded={messageIndex !== null}
+            className="group flex w-full cursor-grab flex-col items-center rounded-3xl p-1 active:cursor-grabbing focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
+          >
+            <motion.div
+              className="relative w-[112px] [perspective:900px]"
+              animate={reduceMotion ? undefined : { rotateX: tilt.x, rotateY: tilt.y, rotateZ: dragging ? 0 : [0, 1.2, -1.2, 0] }}
+              transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.7 }}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <motion.img
+                src="/images/sharmila-mascot.webp"
+                alt=""
+                draggable={false}
+                className="relative z-10 block h-auto w-full select-none drop-shadow-[0_18px_16px_rgba(55,28,42,.24)]"
+                whileHover={reduceMotion ? undefined : { scale: 1.055, y: -5 }}
+                style={{ transform: "translateZ(18px)" }}
+              />
+              <span className="pointer-events-none absolute -bottom-1 left-1/2 h-4 w-16 -translate-x-1/2 rounded-[50%] bg-[#5D344A]/20 blur-md" />
+              <Sparkles className="pointer-events-none absolute right-0 top-[27%] z-20 h-4 w-4 text-[#C18B45] drop-shadow" />
+              <span className="pointer-events-none absolute left-0 top-[42%] z-20 h-2 w-2 rounded-full bg-white/70 blur-[1px]" />
+            </motion.div>
+            <span className="mt-1 flex items-center gap-1 rounded-full border border-white/90 bg-[#FFF9F4]/95 px-3 py-1.5 text-[10px] font-extrabold text-[#8B294B] shadow-[0_6px_20px_rgba(69,30,49,.16)]">
+              <Sparkles size={11} />{mascot.label}
+            </span>
+            <span className="mt-1 text-[9px] font-semibold text-[#8B294B]/70 opacity-0 transition-opacity group-hover:opacity-100">drag me around</span>
+          </button>
+        </motion.div>
+      )}
+    </div>
   );
 }
