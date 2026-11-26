@@ -44,6 +44,11 @@ export const birthdayConfig = {
       { id: "placeholder-3", date: "", title: "A memory to come back to", description: "Write a personal note here and choose the photograph that belongs with it.", image: "" },
     ],
   },
+  letter: {
+    salutation: "Dear Sharmila,",
+    message: "Hey Happy Birthday!.. Be happy and stay strong.. I hope you get everything you want. Be you..!✨ Once again happy birthday - from your former friend",
+    signOff: "from ur frnd ✨",
+  },
   memories: {
     eyebrow: "Little things, forever memories",
     heading: "Our Little Universe",
