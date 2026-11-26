@@ -71,13 +71,18 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
             {/* Candles Container */}
             <div className="relative flex gap-3 xs:gap-4 sm:gap-6 z-20 -mb-3 sm:-mb-4">
                 {candles.map((isOn, i) => (
-                    <motion.div
+                    <motion.button
+                        type="button"
                         key={i}
-                        className="relative cursor-pointer group"
+                        aria-label={isOn ? "Blow out candle " + (i + 1) : "Candle " + (i + 1) + " is blown out"}
+                        aria-pressed={!isOn}
+                        disabled={!isOn}
+                        className="relative cursor-pointer rounded-md bg-transparent p-1 outline-none focus-visible:ring-2 focus-visible:ring-[#8B294B] focus-visible:ring-offset-4 disabled:cursor-default"
                         onClick={() => isOn && blowCandle(i)}
                         whileHover={{ scale: isOn ? 1.1 : 1 }}
+                        whileTap={{ scale: isOn ? 0.92 : 1 }}
                         animate={{ y: [0, -2, 0] }}
-                        transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
+                        transition={{ duration: 2, delay: i * 0.2, repeat: isOn ? Infinity : 0 }}
                     >
                         {/* Flame */}
                         <AnimatePresence>
@@ -121,7 +126,7 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
                         </div>
-                    </motion.div>
+                    </motion.button>
                 ))}
             </div>
 
