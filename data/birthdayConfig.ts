@@ -37,11 +37,10 @@ export const birthdayConfig = {
   timeline: {
     heading: "The little things we remember",
     intro: "A place for the dates, stories, and photographs that mean something.",
-    editLabel: "Edit memories",
     placeholders: [
-      { id: "placeholder-1", date: "", title: "A moment worth keeping", description: "Replace this with the story behind a favourite memory.", image: "" },
-      { id: "placeholder-2", date: "", title: "One of our favourite days", description: "Add what happened, why it mattered, and the little details you remember.", image: "" },
-      { id: "placeholder-3", date: "", title: "A memory to come back to", description: "Write a personal note here and choose the photograph that belongs with it.", image: "" },
+      { id: "memory-3", date: "2025-10-01", title: "Memory 3", description: "A little moment worth keeping." },
+      { id: "memory-1", date: "2026-01-01", title: "Memory 1", description: "A little moment worth keeping." },
+      { id: "memory-2", date: "2026-05-01", title: "Memory 2", description: "A little moment worth keeping." },
     ],
   },
   letter: {
