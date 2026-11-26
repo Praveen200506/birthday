@@ -3,10 +3,6 @@ import crypto from "crypto";
 const BLOG_SESSION_COOKIE = "blog_session";
 const BLOG_ADMIN_SESSION_COOKIE = "blog_admin_session";
 
-// Fallback secrets for local development if not yet set in .env
-const DEFAULT_SESSION_SECRET = "bday_blog_reader_secret_key_2026_safe_default";
-const DEFAULT_ADMIN_SECRET = "bday_blog_admin_secret_key_2026_safe_default";
-
 // In-memory rate limiting for security
 interface RateLimitEntry {
   attempts: number;
@@ -65,10 +61,7 @@ export const verifyBlogPin = (pin: string): boolean => {
     return safeCompare(inputHash, expectedHash.trim());
   }
 
-  // Fallback for initial local development if neither is configured (PIN: 3001)
-  // Ensures zero-crash out of the box while logging instructions
-  const defaultHash = hashSecret("3001");
-  return safeCompare(hashSecret(pin), defaultHash);
+  return false;
 };
 
 /**
@@ -83,9 +76,7 @@ export const verifyAdminPassword = (password: string): boolean => {
     return safeCompare(inputHash, expectedHash.trim());
   }
 
-  // Fallback for initial local development (Password: "birthday2026")
-  const defaultHash = hashSecret("birthday2026");
-  return safeCompare(hashSecret(password), defaultHash);
+  return false;
 };
 
 /**
@@ -136,30 +127,36 @@ const verifySignedToken = (token: string, secret: string): boolean => {
  * Reader session utilities
  */
 export const getBlogReaderSessionToken = (): string => {
-  const secret = process.env.BLOG_SESSION_SECRET || DEFAULT_SESSION_SECRET;
+  const secret = process.env.BLOG_SESSION_SECRET?.trim();
+  if (!secret || secret.length < 32) {
+    throw new Error("BLOG_SESSION_SECRET must be configured with at least 32 characters.");
+  }
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
   return createSignedToken({ role: "reader" }, secret, SEVEN_DAYS_MS);
 };
 
 export const verifyBlogReaderSession = (token?: string | null): boolean => {
   if (!token) return false;
-  const secret = process.env.BLOG_SESSION_SECRET || DEFAULT_SESSION_SECRET;
-  return verifySignedToken(token, secret);
+  const secret = process.env.BLOG_SESSION_SECRET?.trim();
+  return Boolean(secret && secret.length >= 32 && verifySignedToken(token, secret));
 };
 
 /**
  * Admin session utilities
  */
 export const getBlogAdminSessionToken = (): string => {
-  const secret = process.env.BLOG_ADMIN_SESSION_SECRET || DEFAULT_ADMIN_SECRET;
+  const secret = process.env.BLOG_ADMIN_SESSION_SECRET?.trim();
+  if (!secret || secret.length < 32) {
+    throw new Error("BLOG_ADMIN_SESSION_SECRET must be configured with at least 32 characters.");
+  }
   const ONE_DAY_MS = 24 * 60 * 60 * 1000;
   return createSignedToken({ role: "admin" }, secret, ONE_DAY_MS);
 };
 
 export const verifyBlogAdminSession = (token?: string | null): boolean => {
   if (!token) return false;
-  const secret = process.env.BLOG_ADMIN_SESSION_SECRET || DEFAULT_ADMIN_SECRET;
-  return verifySignedToken(token, secret);
+  const secret = process.env.BLOG_ADMIN_SESSION_SECRET?.trim();
+  return Boolean(secret && secret.length >= 32 && verifySignedToken(token, secret));
 };
 
 export { BLOG_SESSION_COOKIE, BLOG_ADMIN_SESSION_COOKIE };
