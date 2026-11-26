@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
 interface Memory {
   id: string;
@@ -196,13 +197,13 @@ export default function MemoryGallery() {
         className="mx-auto mb-8 max-w-3xl text-center sm:mb-12"
       >
         <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-xs text-mypink shadow-sm">
-          <Sparkles size={14} /> Little things, forever memories
+          <Sparkles size={14} /> {birthdayConfig.memories.eyebrow}
         </p>
         <h1 className="mb-3 text-4xl font-handwriting text-stone-800 sm:text-6xl">
-          Our Little Universe
+          {birthdayConfig.memories.heading}
         </h1>
         <p className="mx-auto max-w-xl text-sm leading-7 text-stone-500 sm:text-base">
-          A growing collection of moments worth keeping. Every new memory is saved and will be here the next time you visit.
+          {birthdayConfig.memories.description}
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -369,9 +370,9 @@ export default function MemoryGallery() {
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-mypink">
             <Images size={28} />
           </div>
-          <h2 className="mb-2 text-2xl font-handwriting text-stone-700">A fresh page for new memories</h2>
+          <h2 className="mb-2 text-2xl font-handwriting text-stone-700">{birthdayConfig.memories.emptyHeading}</h2>
           <p className="max-w-sm text-sm leading-6 text-stone-500">
-            No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.
+            {birthdayConfig.memories.emptyDescription}
           </p>
           <button
             type="button"
@@ -404,7 +405,7 @@ export default function MemoryGallery() {
                     alt={memory.title}
                     fill
                     sizes="(max-width: 640px) 45vw, (max-width: 768px) 240px, 280px"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain bg-[#F7F1EE] p-1 transition-transform duration-500 group-hover:scale-[1.01]"
                   />
                 </div>
                 <div className="px-1 pt-3">
