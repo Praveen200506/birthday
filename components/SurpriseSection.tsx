@@ -2,97 +2,155 @@
 
 import { useState } from "react";
 import confetti from "canvas-confetti";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Heart, RotateCcw, X } from "lucide-react";
 import Cake from "./Cake";
 
-const SurpriseSection = () => {
-    const [candlesOut, setCandlesOut] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+export default function SurpriseSection() {
+  const [candlesOut, setCandlesOut] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showFinal, setShowFinal] = useState(false);
 
-    const handleAllCandlesOut = () => {
-        setCandlesOut(true);
-        const duration = 240;
-        const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+  const handleAllCandlesOut = () => {
+    if (candlesOut) return;
+    setCandlesOut(true);
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      startVelocity: 42,
+      origin: { y: 0.58 },
+      colors: ["#8B294B", "#E98591", "#F5C46B", "#B7A6D8", "#FFF0E9"],
+      zIndex: 120,
+    });
+    window.setTimeout(() => setIsOpen(true), 850);
+  };
 
-        const randomInRange = (min: number, max: number) => {
-            return Math.random() * (max - min) + min;
-        }
+  const openFinalScene = () => {
+    setIsOpen(false);
+    setShowFinal(true);
+    window.dispatchEvent(new Event("final-scene"));
+  };
 
-        const interval: ReturnType<typeof setInterval> = setInterval(function () {
-            const timeLeft = animationEnd - Date.now();
+  const restart = () => {
+    setIsOpen(false);
+    setShowFinal(false);
+    setCandlesOut(false);
+    window.location.reload();
+  };
 
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
+  return (
+    <section className="relative z-10 flex w-full max-w-full flex-col items-center justify-center overflow-hidden bg-transparent px-3 pb-32 pt-14 text-center sm:px-4 sm:pb-36 sm:pt-24">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <span className="birthday-drift absolute left-[12%] top-16 h-32 w-32 rounded-full bg-[#F3A5A2]/35 blur-3xl" />
+        <span className="birthday-drift absolute right-[12%] top-36 h-40 w-40 rounded-full bg-[#F7C77D]/35 blur-3xl" />
+        <span className="birthday-twinkle absolute left-[24%] top-1/3 h-3 w-3 rotate-45 bg-[#D65A7D]/80" />
+        <span className="birthday-twinkle absolute right-[22%] top-1/2 h-2.5 w-2.5 rotate-45 bg-[#C18B45]/80" />
+      </div>
 
-            const particleCount = 50 * (timeLeft / duration);
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-        }, 250);
+      <motion.header
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65 }}
+        className="relative z-10 mb-5 max-w-2xl px-3"
+      >
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[#A43F60]">A little birthday ritual</p>
+        <h1 className="font-display text-4xl leading-tight text-[#38252E] sm:text-6xl">Make a wish, Sharmila.</h1>
+        <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-[#684E55] sm:text-base">
+          Tap each candle to blow it out. Keep your wish close — there is a little surprise waiting at the end.
+        </p>
+      </motion.header>
 
-        setTimeout(() => {
-            setIsOpen(true);
-        }, 1500);
+      <div className="relative z-10">
+        {!candlesOut ? (
+          <Cake onAllCandlesOut={handleAllCandlesOut} />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 22, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 170, damping: 18 }}
+            className="mx-auto mt-8 max-w-lg rounded-3xl border border-[#E7B7B4] bg-[#FFF9F4]/95 p-7 shadow-[0_18px_55px_rgba(126,53,74,0.16)] backdrop-blur-xl sm:p-10"
+          >
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#FCE5E8] text-[#8B294B]">
+              <Heart size={26} fill="currentColor" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#A43F60]">All five candles, one wish</p>
+            <h2 className="mt-3 font-display text-3xl text-[#38252E] sm:text-4xl">Your wish is on its way.</h2>
+            <p className="mt-3 text-sm leading-7 text-[#684E55]">The flames are out, but the celebration is just getting started.</p>
+            <button
+              type="button"
+              onClick={() => setIsOpen(true)}
+              className="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:-translate-y-0.5 hover:bg-[#64243D] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
+            >
+              Open your birthday wish <ArrowRight size={17} />
+            </button>
+            <button type="button" onClick={restart} className="mx-auto mt-4 flex min-h-10 items-center gap-2 rounded-full px-4 text-xs font-bold text-[#8B294B] transition hover:bg-[#FCE5E8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B294B]">
+              <RotateCcw size={14} /> Start again
+            </button>
+          </motion.div>
+        )}
+      </div>
 
-        setTimeout(() => {
-            window.dispatchEvent(new Event("final-scene"));
-        }, 10000);
-    };
-
-    return (
-        <section className="py-14 sm:py-24 px-3 sm:px-4 text-center bg-transparent flex flex-col items-center justify-center relative z-10 w-full max-w-full pb-28 sm:pb-32">
-            {!candlesOut ? (
-                <Cake onAllCandlesOut={handleAllCandlesOut} />
-            ) : (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center px-4"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed inset-0 z-[90] flex items-center justify-center bg-[#38252E]/65 p-3 backdrop-blur-md sm:p-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="birthday-wish-title"
+              className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-white/80 bg-[#FFFAF5] p-7 text-center shadow-2xl sm:p-10"
+              initial={{ y: 35, opacity: 0, scale: 0.96 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.97 }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-[#8B294B] via-[#E98591] to-[#F2C36B]" />
+              <button type="button" aria-label="Close birthday wish" onClick={() => setIsOpen(false)} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#F7E8E5] text-[#672039] transition hover:bg-[#EFCFD0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B294B]">
+                <X size={17} />
+              </button>
+              <motion.div
+                initial={{ scale: 0.7, rotate: -12 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 180, damping: 12, delay: 0.12 }}
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#FCE5E8] text-[#8B294B]"
+              >
+                <Heart size={30} fill="currentColor" />
+              </motion.div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#A43F60]">Made with love</p>
+              <h2 id="birthday-wish-title" className="mt-3 font-display text-4xl text-[#38252E] sm:text-5xl">Happy Birthday!</h2>
+              <p className="mt-5 font-display text-xl italic leading-relaxed text-[#684E55]">
+                “May your day be as bright as your smile and as beautiful as your heart.”
+              </p>
+              <p className="mt-4 text-sm leading-6 text-[#795F65]">May the year ahead bring you all the little things that make life wonderful.</p>
+              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-[#672039] bg-[#8B294B] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:bg-[#64243D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
                 >
-                    <h3 className="text-3xl sm:text-4xl font-handwriting text-mypink mb-4">A Wish Came True! ✨</h3>
-                </motion.div>
-            )}
+                  Thank you
+                </button>
+                <button
+                  type="button"
+                  onClick={openFinalScene}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border-2 border-[#8B294B] bg-white px-6 py-3 text-sm font-bold text-[#8B294B] transition hover:bg-[#FCE5E8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
+                >
+                  One last message <ArrowRight size={16} />
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        className="fixed inset-0 z-50 flex items-center justify-center p-3 xs:p-4 bg-black/30 backdrop-blur-md"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <motion.div
-                            className="bg-white/85 backdrop-blur-xl p-6 xs:p-8 sm:p-10 rounded-2xl sm:rounded-[3rem] shadow-2xl max-w-sm sm:max-w-md w-full text-center relative overflow-hidden border border-white/60 mx-2"
-                            initial={{ y: 80, opacity: 0, scale: 0.95 }}
-                            animate={{ y: 0, opacity: 1, scale: 1 }}
-                            exit={{ y: 80, opacity: 0, scale: 0.95 }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-soft-pink via-lavender to-gold" />
-                            <div className="absolute -top-10 -right-10 w-28 sm:w-32 h-28 sm:h-32 bg-gold/15 rounded-full blur-2xl" />
-                            <div className="absolute -bottom-10 -left-10 w-28 sm:w-32 h-28 sm:h-32 bg-soft-pink/25 rounded-full blur-2xl" />
-
-                            <h4 className="text-3xl sm:text-4xl font-handwriting text-mypink mb-4 sm:mb-6">Happy Birthday! 🎂</h4>
-                            <p className="text-lg sm:text-xl font-handwriting text-stone-700 leading-relaxed">
-                                &ldquo;May your day be as bright as your smile and as beautiful as your heart.&rdquo;
-                            </p>
-                            <div className="mt-6 sm:mt-8 flex justify-center gap-4">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setIsOpen(false)}
-                                    className="px-7 sm:px-8 py-2.5 sm:py-3 bg-mypink text-white rounded-full font-sans text-xs sm:text-sm font-medium shadow-lg shadow-pink-200"
-                                >
-                                    Thank You! ❤️
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </section>
-    );
-};
-
-export default SurpriseSection;
+      {showFinal && (
+        <span className="sr-only" role="status">The final birthday message is open.</span>
+      )}
+    </section>
+  );
+}
