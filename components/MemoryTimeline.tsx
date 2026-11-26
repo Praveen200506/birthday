@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { CalendarDays, ImagePlus, LoaderCircle, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 
@@ -91,24 +92,49 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
 
     setUploadingId(id);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("title", milestone.title.trim() || "A birthday memory");
-      form.append("caption", milestone.description.trim());
-
-      const response = await fetch("/api/memories/upload-file", {
+      const response = await fetch("/api/memories/upload-url", {
         method: "POST",
-        body: form,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: file.type, size: file.size }),
       });
-      const data = await response.json();
-      if (!response.ok || !data.success || !data.memory?.imageUrl) {
-        throw new Error(data.message || "Could not upload the photo.");
+      const signed = await response.json();
+      if (!response.ok || !signed.success || !signed.path || !signed.token || !signed.bucket || !signed.supabaseUrl || !signed.anonKey) {
+        throw new Error(signed.message || "Could not prepare the photo upload.");
       }
 
-      const savedMemory = data.memory as SavedMemory;
+      // Use the same Supabase client and signed-upload flow as the Memories page.
+      // Public client configuration is supplied by the server route to avoid
+      // relying on potentially missing build-time NEXT_PUBLIC env in this component.
+      const supabase = createClient(signed.supabaseUrl, signed.anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      });
+      const { error } = await supabase.storage
+        .from(signed.bucket)
+        .uploadToSignedUrl(signed.path, signed.token, file, {
+          contentType: file.type,
+          cacheControl: "3600",
+          upsert: false,
+        });
+      if (error) throw new Error("Supabase upload failed: " + error.message);
+
+      const saveResponse = await fetch("/api/memories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: milestone.title.trim() || "A birthday memory",
+          caption: milestone.description.trim(),
+          storagePath: signed.path,
+        }),
+      });
+      const saveData = await saveResponse.json();
+      if (!saveResponse.ok || !saveData.success || !saveData.memory?.imageUrl) {
+        throw new Error(saveData.message || "The photo uploaded, but the memory could not be saved.");
+      }
+
+      const savedMemory = saveData.memory as SavedMemory;
       setUploadedMemories((current) => [savedMemory, ...current.filter((memory) => memory.id !== savedMemory.id)]);
       updateMilestone(id, { image: savedMemory.imageUrl });
-      setUploadMessage("Photo uploaded and added to Memories. Save changes to attach it to this timeline milestone.");
+      setUploadMessage("Photo uploaded and saved to Memories. Save changes to attach it to this timeline milestone.");
     } catch (error) {
       setUploadMessage(error instanceof Error ? error.message : "Photo upload failed. Please try again.");
     } finally {
