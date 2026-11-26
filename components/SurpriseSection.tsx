@@ -5,11 +5,13 @@ import confetti from "canvas-confetti";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Heart, RotateCcw, X } from "lucide-react";
 import Cake from "./Cake";
+import { birthdayConfig as config } from "@/data/birthdayConfig";
+import { Lightbulb, WandSparkles } from "lucide-react";
 
 export default function SurpriseSection() {
   const [candlesOut, setCandlesOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [showFinal, setShowFinal] = useState(false);
+  const [showFinal, setShowFinal] = useState(false);\n  const [wishIndex, setWishIndex] = useState(0);
 
   const handleAllCandlesOut = () => {
     if (candlesOut) return;
@@ -39,7 +41,7 @@ export default function SurpriseSection() {
   };
 
   return (
-    <section className="relative z-10 flex w-full max-w-full flex-col items-center justify-center overflow-hidden bg-transparent px-3 pb-32 pt-14 text-center sm:px-4 sm:pb-36 sm:pt-24">
+    <section className="relative z-10 min-h-[calc(100svh-2rem)] w-full overflow-hidden bg-transparent px-4 pb-36 pt-10 sm:px-8 lg:flex lg:items-center lg:justify-center lg:pt-12">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <span className="birthday-drift absolute left-[12%] top-16 h-32 w-32 rounded-full bg-[#F3A5A2]/35 blur-3xl" />
         <span className="birthday-drift absolute right-[12%] top-36 h-40 w-40 rounded-full bg-[#F7C77D]/35 blur-3xl" />
@@ -51,16 +53,16 @@ export default function SurpriseSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65 }}
-        className="relative z-10 mb-5 max-w-2xl px-3"
+        className="relative z-10 mx-auto mb-6 max-w-2xl px-3 text-center lg:mb-0 lg:w-[36%] lg:pr-8"
       >
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[#A43F60]">A little birthday ritual</p>
-        <h1 className="font-display text-4xl leading-tight text-[#38252E] sm:text-6xl">Make a wish, Sharmila.</h1>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[#A43F60]">{config.surprise.eyebrow}</p>
+        <h1 className="font-display text-4xl leading-tight text-[#38252E] sm:text-6xl">{config.surprise.heading}</h1>
         <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-[#684E55] sm:text-base">
-          Tap each candle to blow it out. Keep your wish close — there is a little surprise waiting at the end.
+          {config.surprise.instructions}
         </p>
       </motion.header>
 
-      <div className="relative z-10">
+      <div className="relative z-10 mx-auto w-full max-w-[680px] lg:mx-0 lg:w-[42%]">
         {!candlesOut ? (
           <Cake onAllCandlesOut={handleAllCandlesOut} />
         ) : (
@@ -74,8 +76,8 @@ export default function SurpriseSection() {
               <Heart size={26} fill="currentColor" />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#A43F60]">All five candles, one wish</p>
-            <h2 className="mt-3 font-display text-3xl text-[#38252E] sm:text-4xl">Your wish is on its way.</h2>
-            <p className="mt-3 text-sm leading-7 text-[#684E55]">The flames are out, but the celebration is just getting started.</p>
+            <h2 className="mt-3 font-display text-3xl text-[#38252E] sm:text-4xl">{config.surprise.completedTitle}</h2>
+            <p className="mt-3 text-sm leading-7 text-[#684E55]">{config.surprise.completedCopy}</p>
             <button
               type="button"
               onClick={() => setIsOpen(true)}
@@ -122,11 +124,11 @@ export default function SurpriseSection() {
                 <Heart size={30} fill="currentColor" />
               </motion.div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#A43F60]">Made with love</p>
-              <h2 id="birthday-wish-title" className="mt-3 font-display text-4xl text-[#38252E] sm:text-5xl">Happy Birthday!</h2>
+              <h2 id="birthday-wish-title" className="mt-3 font-display text-4xl text-[#38252E] sm:text-5xl">{config.surprise.modalTitle}</h2>
               <p className="mt-5 font-display text-xl italic leading-relaxed text-[#684E55]">
-                “May your day be as bright as your smile and as beautiful as your heart.”
+                “{config.surprise.modalWish}”
               </p>
-              <p className="mt-4 text-sm leading-6 text-[#795F65]">May the year ahead bring you all the little things that make life wonderful.</p>
+              <p className="mt-4 text-sm leading-6 text-[#795F65]">{config.surprise.modalCopy}</p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <button
                   type="button"
