@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { CalendarDays, ImagePlus, LoaderCircle, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 
 type Milestone = {
@@ -15,6 +14,7 @@ type Milestone = {
 
 const STORAGE_KEY = "sharmila-birthday-milestones-v1";
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+type SavedMemory = { id: string; title: string; caption: string; imageUrl: string; createdAt: string };
 const placeholders: Milestone[] = [
   { id: "placeholder-1", date: "", title: "A moment worth keeping", description: "Replace this with the story behind a favourite memory.", image: "" },
   { id: "placeholder-2", date: "", title: "One of our favourite days", description: "Add what happened, why it mattered, and the little details you remember.", image: "" },
@@ -32,8 +32,20 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
   const [saved, setSaved] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadedMemories, setUploadedMemories] = useState<SavedMemory[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/memories", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Could not load uploaded memories.");
+        if (!cancelled) setUploadedMemories(Array.isArray(data.memories) ? data.memories : []);
+      })
+      .catch(() => {
+        if (!cancelled) setUploadMessage("Saved gallery photos are temporarily unavailable. You can still upload a new photo.");
+      });
+
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -43,6 +55,7 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
     } catch {
       // Keep the editable placeholder content if browser storage is unavailable.
     }
+    return () => { cancelled = true; };
   }, []);
 
   function updateMilestone(id: string, patch: Partial<Milestone>) {
@@ -69,34 +82,33 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
       setUploadMessage("The image must be smaller than 15 MB.");
       return;
     }
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !anonKey) {
-      setUploadMessage("Photo uploads are not configured. Add the Supabase public URL and anon key.");
+
+    const milestone = milestones.find((item) => item.id === id);
+    if (!milestone) {
+      setUploadMessage("This memory could not be found. Please close and reopen the editor.");
       return;
     }
 
     setUploadingId(id);
     try {
-      const response = await fetch("/api/memories/upload-url", {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("title", milestone.title.trim() || "A birthday memory");
+      form.append("caption", milestone.description.trim());
+
+      const response = await fetch("/api/memories/upload-file", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: file.type, size: file.size }),
+        body: form,
       });
-      const signed = await response.json();
-      if (!response.ok || !signed.success || !signed.path || !signed.token || !signed.bucket) {
-        throw new Error(signed.message || "Could not prepare the photo upload.");
+      const data = await response.json();
+      if (!response.ok || !data.success || !data.memory?.imageUrl) {
+        throw new Error(data.message || "Could not upload the photo.");
       }
 
-      const supabase = createClient(supabaseUrl, anonKey);
-      const { error } = await supabase.storage
-        .from(signed.bucket)
-        .uploadToSignedUrl(signed.path, signed.token, file, { contentType: file.type, upsert: false });
-      if (error) throw new Error(error.message || "Supabase could not upload this image.");
-
-      const publicUrl = supabase.storage.from(signed.bucket).getPublicUrl(signed.path).data.publicUrl;
-      updateMilestone(id, { image: publicUrl });
-      setUploadMessage("Photo uploaded. Save changes to keep it in this browser.");
+      const savedMemory = data.memory as SavedMemory;
+      setUploadedMemories((current) => [savedMemory, ...current.filter((memory) => memory.id !== savedMemory.id)]);
+      updateMilestone(id, { image: savedMemory.imageUrl });
+      setUploadMessage("Photo uploaded and added to Memories. Save changes to attach it to this timeline milestone.");
     } catch (error) {
       setUploadMessage(error instanceof Error ? error.message : "Photo upload failed. Please try again.");
     } finally {
@@ -166,6 +178,7 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
                   <label className="block text-xs font-bold text-[#59434A]">Choose an existing photograph
                     <select value={item.image.startsWith("http") ? "" : item.image} onChange={(event) => updateMilestone(item.id, { image: event.target.value })} className={inputClass}>
                       <option value="">Use an uploaded photo / no existing photo</option>
+                      {uploadedMemories.map((memory) => <option key={memory.id} value={memory.imageUrl}>{memory.title || "Uploaded memory"}</option>)}
                       {images.map((src) => <option key={src} value={src}>{src.split("/").pop()}</option>)}
                     </select>
                   </label>
