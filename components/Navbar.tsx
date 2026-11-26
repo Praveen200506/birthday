@@ -2,30 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Image as ImageIcon, Heart, Gift, BookOpen } from "lucide-react";
+import { BookOpen, Gift, Heart, Home, Images } from "lucide-react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
-const navItems = [
-  { name: "Home", path: "/", icon: Home },
-  { name: "Memories", path: "/memories", icon: ImageIcon },
-  { name: "Letter", path: "/letter", icon: Heart },
-  { name: "Surprise", path: "/surprise", icon: Gift },
-  { name: "Blog", path: "/blog", icon: BookOpen },
-];
+const icons = { home: Home, images: Images, heart: Heart, gift: Gift, "book-open": BookOpen } as const;
 
 export default function Navbar() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-3 left-1/2 z-[60] w-max max-w-[calc(100vw-1.25rem)] -translate-x-1/2">
-      <div className="flex items-center gap-1 rounded-full border-2 border-[#DDA9A9] bg-[#FFF9F4]/95 px-2 py-2 shadow-[0_10px_34px_rgba(102,43,61,0.20)] backdrop-blur-xl sm:gap-3 sm:px-4">
-        {navItems.map((item) => {
-          const active = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);
-          return (
-            <Link key={item.path} href={item.path} aria-current={active ? "page" : undefined}
-              className={"flex min-w-0 flex-col items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-bold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B294B] sm:min-w-[58px] sm:px-3 sm:text-xs " + (active ? "bg-[#8B294B] text-white shadow-md" : "text-[#59313F] hover:bg-[#F9E2E3] hover:text-[#762D49]")}>
-              <item.icon aria-hidden="true" className="h-4 w-4 sm:h-[18px] sm:w-[18px]" strokeWidth={1.9} />
-              <span>{item.name}</span>
-            </Link>
-          );
+    <nav aria-label="Main navigation" className="fixed inset-x-0 bottom-3 z-[60] flex justify-center px-2">
+      <div className="grid w-full max-w-[560px] grid-cols-5 items-stretch gap-1 rounded-[1.5rem] border border-[#DDA9A9] bg-[#FFF9F4]/95 p-1.5 shadow-[0_10px_34px_rgba(102,43,61,0.22)] backdrop-blur-xl sm:gap-2 sm:p-2">
+        {birthdayConfig.navigation.map((item) => {
+          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const Icon = icons[item.icon as keyof typeof icons];
+          return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
+            className={"relative flex min-h-[58px] w-full flex-col items-center justify-center gap-1.5 rounded-[1.1rem] px-1 py-2 text-center text-[10px] font-bold leading-none transition-all duration-200 sm:min-h-[64px] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B294B] " + (active ? "bg-[#8B294B] text-white shadow-md" : "text-[#59313F] hover:bg-[#F9E2E3] hover:text-[#762D49]")}>
+              <Icon aria-hidden="true" className="h-[18px] w-[18px] shrink-0" strokeWidth={1.9}/>
+              <span className="block w-full text-center">{item.label}</span>
+            </Link>;
         })}
       </div>
     </nav>

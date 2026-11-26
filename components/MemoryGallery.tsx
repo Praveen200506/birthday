@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -16,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
 interface Memory {
   id: string;
@@ -114,66 +114,26 @@ export default function MemoryGallery() {
       return;
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setError("Supabase public URL and anon key are missing from the app environment.");
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
     setNotice(null);
 
     try {
-      const signedResponse = await fetch("/api/memories/upload-url", {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("title", title.trim());
+      formData.set("caption", caption.trim());
+      const uploadResponse = await fetch("/api/memories/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          size: file.size,
-        }),
+        body: formData,
       });
-      const signedData = await signedResponse.json();
-      if (!signedResponse.ok || !signedData.success) {
-        throw new Error(signedData.message || "Could not prepare the image upload.");
+      const uploadData = await uploadResponse.json();
+      if (!uploadResponse.ok || !uploadData.success || !uploadData.memory?.imageUrl) {
+        throw new Error(uploadData.message || "Could not upload this memory.");
       }
+      const savedMemory = uploadData.memory as Memory;
 
-      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-        },
-      });
-      const { error: uploadError } = await supabase.storage
-        .from(signedData.bucket)
-        .uploadToSignedUrl(signedData.path, signedData.token, file, {
-          contentType: file.type,
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw new Error("Supabase upload failed: " + uploadError.message);
-      }
-
-      const saveResponse = await fetch("/api/memories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim(),
-          caption: caption.trim(),
-          storagePath: signedData.path,
-        }),
-      });
-      const saveData = await saveResponse.json();
-      if (!saveResponse.ok || !saveData.success) {
-        throw new Error(saveData.message || "The image uploaded, but the memory could not be saved.");
-      }
-
-      setMemories((current) => [saveData.memory, ...current]);
+      setMemories((current) => [savedMemory, ...current]);
       closeComposer();
       setNotice("Your new memory has been added. ❤️");
     } catch (uploadFailure) {
@@ -196,13 +156,13 @@ export default function MemoryGallery() {
         className="mx-auto mb-8 max-w-3xl text-center sm:mb-12"
       >
         <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-xs text-mypink shadow-sm">
-          <Sparkles size={14} /> Little things, forever memories
+          <Sparkles size={14} /> {birthdayConfig.memories.eyebrow}
         </p>
         <h1 className="mb-3 text-4xl font-handwriting text-stone-800 sm:text-6xl">
-          Our Little Universe
+          {birthdayConfig.memories.heading}
         </h1>
         <p className="mx-auto max-w-xl text-sm leading-7 text-stone-500 sm:text-base">
-          A growing collection of moments worth keeping. Every new memory is saved and will be here the next time you visit.
+          {birthdayConfig.memories.description}
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -223,7 +183,7 @@ export default function MemoryGallery() {
               setNotice(null);
               setShowUploader((current) => !current);
             }}
-            className="inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-200 transition hover:-translate-y-0.5 hover:bg-pink-400"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition duration-200 hover:-translate-y-0.5 hover:bg-[#64243D] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B] active:translate-y-0"
           >
             {showUploader ? <X size={16} /> : <Plus size={17} />}
             {showUploader ? "Close uploader" : "Add a memory"}
@@ -330,7 +290,7 @@ export default function MemoryGallery() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-full bg-mypink px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:bg-[#64243D] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
                 >
                   {submitting ? <LoaderCircle size={16} className="animate-spin" /> : <Upload size={16} />}
                   {submitting ? "Uploading..." : "Save memory"}
@@ -369,14 +329,14 @@ export default function MemoryGallery() {
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-mypink">
             <Images size={28} />
           </div>
-          <h2 className="mb-2 text-2xl font-handwriting text-stone-700">A fresh page for new memories</h2>
+          <h2 className="mb-2 text-2xl font-handwriting text-stone-700">{birthdayConfig.memories.emptyHeading}</h2>
           <p className="max-w-sm text-sm leading-6 text-stone-500">
-            No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.
+            {birthdayConfig.memories.emptyDescription}
           </p>
           <button
             type="button"
             onClick={() => setShowUploader(true)}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:bg-[#64243D] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
           >
             <Plus size={17} /> Add the first memory
           </button>
@@ -400,11 +360,12 @@ export default function MemoryGallery() {
               <div className="relative h-full rounded-sm bg-white p-2 pb-4 shadow-md transition-shadow duration-300 group-hover:shadow-xl sm:p-3 sm:pb-6">
                 <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-stone-100">
                   <Image
+                    unoptimized
                     src={memory.imageUrl}
                     alt={memory.title}
                     fill
                     sizes="(max-width: 640px) 45vw, (max-width: 768px) 240px, 280px"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain bg-[#F7F1EE] p-1 transition-transform duration-500 group-hover:scale-[1.01]"
                   />
                 </div>
                 <div className="px-1 pt-3">
@@ -453,7 +414,6 @@ export default function MemoryGallery() {
                   alt={selectedMemory.title}
                   width={1600}
                   height={1200}
-                  unoptimized
                   className="mx-auto max-h-[68vh] w-auto max-w-full object-contain sm:max-h-[72vh]"
                 />
               </div>

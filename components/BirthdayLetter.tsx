@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
-const message = ` Hey Happy Birthday!.. Be happy and stay strong.. I hope you get everything you want. Be you..!✨ Once again happy birthday - from your former friend`;
+const message = birthdayConfig.letter.message;
 
 const BirthdayLetter = () => {
     const [displayedText, setDisplayedText] = useState("");
@@ -37,13 +38,13 @@ const BirthdayLetter = () => {
                 {/* Washi Tape Accent */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 sm:w-28 h-5 sm:h-6 bg-yellow-200/50 backdrop-blur-xs -rotate-1 border border-yellow-300/30 shadow-xs pointer-events-none" />
 
-                <h3 className="text-2xl sm:text-3xl font-handwriting text-mypink mb-4 sm:mb-6">Dear Sharmila,</h3>
+                <h3 className="text-2xl sm:text-3xl font-handwriting text-mypink mb-4 sm:mb-6">{birthdayConfig.letter.salutation}</h3>
                 <p className="text-lg xs:text-xl md:text-2xl font-handwriting leading-relaxed text-stone-700 min-h-[140px] sm:min-h-[180px]">
                     {displayedText}
                     <span className="animate-pulse text-mypink font-bold">|</span>
                 </p>
                 <div className="mt-6 sm:mt-8 text-right">
-                    <p className="text-xl sm:text-2xl font-handwriting text-mypink">from ur frnd ✨</p>
+                    <p className="text-xl sm:text-2xl font-handwriting text-mypink">{birthdayConfig.letter.signOff}</p>
                 </div>
             </motion.div>
         </section>

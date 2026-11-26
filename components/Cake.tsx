@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
 const CELEBRATION_PARTICLES = [
     { x: -120, y: -150, color: '#FFD700' },
@@ -72,12 +73,24 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
             <div className="relative flex gap-3 xs:gap-4 sm:gap-6 z-20 -mb-3 sm:-mb-4">
                 {candles.map((isOn, i) => (
                     <motion.div
+                        role="button"
+                        tabIndex={isOn ? 0 : -1}
                         key={i}
-                        className="relative cursor-pointer group"
+                        aria-label={isOn ? "Blow out candle " + (i + 1) : "Candle " + (i + 1) + " is blown out"}
+                        aria-pressed={!isOn}
+                        aria-disabled={!isOn}
+                        className={"relative rounded-md bg-transparent p-1 outline-none focus-visible:ring-2 focus-visible:ring-[#8B294B] focus-visible:ring-offset-4 " + (isOn ? "cursor-pointer" : "cursor-default opacity-80")}
                         onClick={() => isOn && blowCandle(i)}
+                        onKeyDown={(event) => {
+                            if (isOn && (event.key === "Enter" || event.key === " ")) {
+                                event.preventDefault();
+                                blowCandle(i);
+                            }
+                        }}
                         whileHover={{ scale: isOn ? 1.1 : 1 }}
+                        whileTap={{ scale: isOn ? 0.92 : 1 }}
                         animate={{ y: [0, -2, 0] }}
-                        transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
+                        transition={{ duration: 2, delay: i * 0.2, repeat: isOn ? Infinity : 0 }}
                     >
                         {/* Flame */}
                         <AnimatePresence>
@@ -184,8 +197,8 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
                 transition={{ duration: 3, repeat: Infinity }}
             >
                 {candles.some((c) => c)
-                    ? "Make a wish & blow the candles! 🎂"
-                    : "Wishes do come true! ✨"}
+                    ? birthdayConfig.surprise.instructions
+                    : birthdayConfig.surprise.completedCopy}
             </motion.p>
         </div>
     );

@@ -109,7 +109,7 @@ export default function BlogFeed() {
 
           <Link
             href="/blog/write"
-            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-mypink hover:bg-pink-400 text-white text-xs md:text-sm font-semibold shadow-sm shadow-pink-200 transition-all shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full border-2 border-[#672039] bg-[#8B294B] hover:bg-[#64243D] text-white text-xs md:text-sm font-semibold shadow-sm shadow-pink-200 transition-all shrink-0"
           >
             <Feather size={13} />
             <span>Write</span>
@@ -165,7 +165,7 @@ export default function BlogFeed() {
 
             <Link
               href="/blog/write"
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-mypink text-white text-xs md:text-sm font-medium shadow-sm shadow-pink-200 hover:bg-pink-400 transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border-2 border-[#672039] bg-[#8B294B] text-white text-xs md:text-sm font-bold hover:bg-[#64243D] shadow-sm shadow-pink-200 hover:bg-pink-400 transition-colors"
             >
               <PlusCircle size={14} />
               Write First Story
