@@ -89,3 +89,69 @@ body::before {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Autonomous birthday companion — the original illustration remains the sprite. */
+.chibi-pet-sprite {
+  position: relative;
+  width: 100%;
+  transform-origin: 50% 88%;
+  will-change: transform;
+  transition: filter 220ms ease;
+}
+.chibi-pet-sprite img { transform-origin: center; }
+.chibi-pet-idle { animation: chibi-breathe 3.2s ease-in-out infinite; }
+.chibi-pet-walking, .chibi-pet-following { animation: chibi-walk 420ms ease-in-out infinite; }
+.chibi-pet-curious { animation: chibi-curious 2.2s ease-in-out both; }
+.chibi-pet-jumping { animation: chibi-jump 760ms cubic-bezier(.2,.75,.25,1) both; }
+.chibi-pet-sitting { animation: chibi-sit 650ms ease-in-out both; }
+.chibi-pet-sleeping { animation: chibi-sleep 2.8s ease-in-out infinite; }
+.chibi-pet-dragging { animation: none; }
+.chibi-pet-zzz {
+  position: absolute; z-index: 30; top: 5%; right: 2%;
+  color: #8B294B; font-size: 13px; font-weight: 900; letter-spacing: 2px;
+  text-shadow: 0 1px 5px #FFF9F4;
+  animation: chibi-zzz 2.2s ease-in-out infinite;
+}
+.chibi-pet-thought {
+  position: absolute; z-index: 30; top: 15%; right: 2%;
+  display: grid; width: 20px; height: 20px; place-items: center;
+  border-radius: 50%; background: #FFF9F4; color: #8B294B;
+  font-size: 12px; font-weight: 900; box-shadow: 0 2px 8px #59313F22;
+}
+@keyframes chibi-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.012, 1.018); }
+}
+@keyframes chibi-walk {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+@keyframes chibi-curious {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  35% { transform: rotate(4deg) translateY(-3px); }
+  70% { transform: rotate(-3deg) translateY(-1px); }
+}
+@keyframes chibi-jump {
+  0% { transform: translateY(0) scale(1); }
+  28% { transform: translateY(-32px) scale(1.04, .96); }
+  55% { transform: translateY(-38px) scale(.98, 1.03); }
+  82% { transform: translateY(2px) scale(1.06, .94); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes chibi-sit {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45%, 65% { transform: translateY(5px) scale(1.025, .94); }
+}
+@keyframes chibi-sleep {
+  0%, 100% { transform: rotate(0) translateY(1px) scale(1); }
+  50% { transform: rotate(-4deg) translateY(4px) scale(.99); }
+}
+@keyframes chibi-zzz {
+  0% { opacity: 0; transform: translate(0, 8px) scale(.8); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate(9px, -18px) scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chibi-pet-sprite, .chibi-pet-zzz { animation: none !important; }
+}
