@@ -3,153 +3,97 @@
 import Image from "next/image";
 import Link from "next/link";
 import MemoryTimeline from "@/components/MemoryTimeline";
+import { birthdayConfig as config } from "@/data/birthdayConfig";
 import { motion, useReducedMotion } from "framer-motion";
+import { ArrowDown, ArrowUpRight, Camera, Heart, Sparkles } from "lucide-react";
 
-interface HeroSectionProps {
-  images: readonly string[];
-}
+interface HeroSectionProps { images: readonly string[]; }
 
-const photoMats = [
-  "bg-[#D8E0D8] border-[#A8B8AA]",
-  "bg-[#E5D7D3] border-[#C9AAA5]",
-  "bg-[#D7DFE4] border-[#A9BAC6]",
-  "bg-[#E8DFC9] border-[#C9B994]",
-];
+const photoMats = ["bg-[#D8E0D8] border-[#A8B8AA]", "bg-[#E5D7D3] border-[#C9AAA5]", "bg-[#D7DFE4] border-[#A9BAC6]", "bg-[#E8DFC9] border-[#C9B994]"];
 
 export default function HeroSection({ images }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
-
+  const person = config.person;
+  const hero = config.hero;
   return (
-    <div className="relative min-h-screen overflow-hidden bg-transparent text-ink">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[760px] overflow-hidden">
-        <span className="birthday-drift absolute -left-10 top-24 h-36 w-36 rounded-full bg-[#F3A5A2]/35 blur-2xl" />
-        <span className="birthday-drift absolute right-[8%] top-16 h-44 w-44 rounded-full bg-[#F7C77D]/35 blur-3xl" />
-        <span className="birthday-twinkle absolute left-[44%] top-36 h-3 w-3 rotate-45 bg-[#D65A7D]/70" />
-        <span className="birthday-twinkle absolute right-[17%] top-[390px] h-2.5 w-2.5 rotate-45 bg-[#C18B45]/80" />
-        <span className="birthday-drift absolute left-[12%] top-[520px] h-5 w-5 rounded-full border-2 border-[#D65A7D]/40" />
+    <div className="relative min-h-screen overflow-hidden text-ink">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <span className="birthday-drift absolute -left-20 top-24 h-64 w-64 rounded-full bg-[#F3A5A2]/35 blur-3xl" />
+        <span className="birthday-drift absolute right-[7%] top-10 h-72 w-72 rounded-full bg-[#F7C77D]/35 blur-3xl" />
+        <span className="birthday-twinkle absolute left-[48%] top-24 h-3 w-3 rotate-45 bg-[#D65A7D]/70" />
+        <span className="birthday-twinkle absolute right-[18%] top-[72%] h-3 w-3 rotate-45 bg-[#C18B45]/80" />
       </div>
-      <motion.section
-        id="home"
-        initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 mx-auto grid min-h-[76svh] w-full max-w-7xl content-center gap-9 px-5 pb-14 pt-14 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:px-12 lg:pb-20 lg:pt-20"
-      >
-        <div className="flex flex-col items-start justify-center">
-          <p className="mb-5 text-sm font-semibold text-berry">
-            A birthday page for Sharmila
+
+      <motion.section id="home" initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 mx-auto grid min-h-[min(850px,92svh)] w-full max-w-[1720px] items-center gap-7 px-5 pb-14 pt-12 sm:px-9 lg:grid-cols-[minmax(330px,0.82fr)_minmax(470px,1.2fr)_minmax(170px,0.38fr)] lg:gap-8 lg:px-12 lg:py-12 xl:gap-12 xl:px-16">
+        <div className="relative z-10 flex flex-col items-start justify-center lg:py-12">
+          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#D99BA7] bg-white/55 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-berry">
+            <Sparkles size={14} /> {person.eyebrow}
           </p>
-          <h1 className="max-w-xl font-display text-[clamp(3.35rem,7.6vw,6.7rem)] leading-[0.96] tracking-[-0.045em]">
-            Happy Birthday, Sharmila.
-          </h1>
-          <p className="mt-7 max-w-md text-base leading-8 text-ink/85 sm:text-lg">
-            Every photograph holds a little piece of a day we shared.
-            I wanted to keep them all somewhere you can come back to.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <a
-              href="#photographs"
-              className="inline-flex min-h-12 items-center justify-center rounded-full bg-berry px-6 py-3 text-sm font-semibold text-[#F8F4F0] transition-colors duration-200 hover:bg-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry"
-            >
-              See every photograph
+          <h1 className="max-w-[680px] font-display text-[clamp(3.5rem,6.3vw,7.4rem)] leading-[0.91] tracking-[-0.055em]">{person.greeting}</h1>
+          <p className="mt-7 max-w-[34rem] text-base leading-8 text-ink/85 sm:text-lg">{person.intro}</p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href="#photographs" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-berry px-6 py-3 text-sm font-bold text-white shadow-lg shadow-berry/20 transition hover:-translate-y-1 hover:bg-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry">
+              {hero.photoCta} <ArrowDown size={16}/>
             </a>
-            <Link
-              href="/letter"
-              className="inline-flex min-h-11 items-center text-sm font-semibold text-berry underline decoration-rose underline-offset-4 transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry"
-            >
-              Read the letter
+            <Link href="/letter" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-berry/40 bg-white/55 px-5 py-3 text-sm font-bold text-berry transition hover:bg-white">
+              {hero.letterCta} <ArrowUpRight size={15}/>
             </Link>
           </div>
-          <p className="mt-10 border-l-2 border-rose pl-4 font-display text-xl italic leading-snug text-berry sm:text-2xl">
-            The best moments deserve to be kept.
-          </p>
+          <p className="mt-9 max-w-sm border-l-2 border-rose pl-4 font-display text-xl italic leading-snug text-berry sm:text-2xl">{person.signature}</p>
         </div>
 
-        <a
-          href="#photographs"
-          aria-label="Go to the birthday photographs"
-          className="group relative block aspect-[4/3] overflow-hidden rounded-[1.8rem] border border-[#A8B8AA] bg-[#D8E0D8] p-2 shadow-[0_18px_48px_rgba(41,53,50,0.12)] transition-shadow duration-300 hover:shadow-[0_22px_54px_rgba(41,53,50,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry sm:aspect-[5/4] lg:aspect-[4/5]"
-        >
-          {images[0] ? (
-            <div className="relative h-full w-full overflow-hidden rounded-[1.25rem] bg-[#E9ECE6]">
-              <Image
-                src={images[0]}
-                alt="A photograph from the birthday collection"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.015]"
-              />
+        <motion.a href="#photographs" aria-label="Explore the birthday photographs"
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.96, rotate: 1.5 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 0.9, delay: 0.12 }} whileHover={reduceMotion ? undefined : { y: -7, rotate: -0.6 }}
+          className="group relative mx-auto block w-full max-w-[850px]">
+          <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-[#E9B85E]/35 via-[#E98591]/25 to-[#AFC8B5]/35 blur-xl"/>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border-[10px] border-[#FFF9F4] bg-[#E8EAE3] shadow-[0_30px_90px_rgba(73,42,54,0.20)] sm:aspect-[5/4] lg:aspect-[4/5]">
+            {images[0] ? <Image src={images[0]} alt="A favourite photograph of Sharmila" fill priority sizes="(max-width: 1024px) 92vw, 52vw" className="object-contain p-1 transition-transform duration-700 group-hover:scale-[1.025]"/> : <div className="flex h-full items-center justify-center text-berry">Add a favourite photograph</div>}
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl border border-white/70 bg-[#FFF9F4]/90 px-4 py-3 shadow-lg backdrop-blur-md">
+              <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-berry">{hero.photoLabel}</p><p className="mt-0.5 font-display text-lg text-ink">A moment to keep</p></div>
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-berry text-white"><Camera size={18}/></span>
             </div>
-          ) : (
-            <span className="flex h-full items-center justify-center px-8 text-center text-berry">
-              Add the birthday photographs to the collection.
-            </span>
-          )}
-        </a>
+          </div>
+        </motion.a>
+
+        <aside className="relative hidden h-full flex-col justify-center gap-5 lg:flex">
+          <div className="rounded-[1.7rem] border border-white/80 bg-white/60 p-5 shadow-[0_16px_45px_rgba(73,42,54,0.08)] backdrop-blur-md">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F9E2E3] text-berry"><Heart size={18} fill="currentColor"/></span>
+            <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-berry">{hero.sideNoteTitle}</p>
+            <p className="mt-2 font-display text-xl leading-snug text-ink">{hero.sideNote}</p>
+          </div>
+          <div className="rounded-[1.7rem] bg-[#8B294B] p-5 text-white shadow-xl shadow-berry/20">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">The collection</p>
+            <p className="mt-2 font-display text-5xl">{images.length.toString().padStart(2,"0")}</p>
+            <p className="mt-1 text-xs text-white/80">photographs and counting</p>
+          </div>
+          <a href="#timeline" className="group flex items-center justify-between rounded-2xl border border-berry/20 bg-white/55 px-4 py-3 text-sm font-bold text-berry transition hover:bg-white">
+            Read the memories <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"/>
+          </a>
+        </aside>
       </motion.section>
 
       <MemoryTimeline images={images} />
 
-      <section
-        id="photographs"
-        aria-labelledby="photographs-heading"
-        className="relative z-10 mx-auto w-full max-w-7xl scroll-mt-8 px-5 pb-32 sm:px-8 lg:px-12"
-      >
-        <div className="mb-8 flex flex-col justify-between gap-3 border-t border-ink/20 pt-6 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-sm font-semibold text-berry">All together, on one page</p>
-            <h2
-              id="photographs-heading"
-              className="mt-2 font-display text-4xl leading-tight tracking-tight sm:text-5xl"
-            >
-              The photographs
-            </h2>
-          </div>
-          <p className="max-w-sm text-sm leading-6 text-ink/75">
-            Every photo is shown in full, without cutting off the moment.
-          </p>
+      <section id="photographs" aria-labelledby="photographs-heading" className="relative z-10 mx-auto w-full max-w-[1720px] scroll-mt-8 px-5 pb-36 sm:px-9 lg:px-16">
+        <div className="mb-8 flex flex-col justify-between gap-4 border-t border-ink/20 pt-6 sm:flex-row sm:items-end">
+          <div><p className="text-sm font-bold text-berry">{hero.galleryLabel}</p><h2 id="photographs-heading" className="mt-2 font-display text-4xl leading-tight tracking-tight sm:text-6xl">{config.hero.galleryLabel}</h2></div>
+          <p className="max-w-md text-sm leading-6 text-ink/75">{hero.galleryDescription}</p>
         </div>
-
-        {images.length > 0 ? (
-          <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4">
-            {images.map((src, index) => {
-              const ratio = index % 5 === 0 ? "aspect-[5/4]" : index % 4 === 2 ? "aspect-[3/4]" : "aspect-[4/5]";
-              return (
-                <figure
-                  key={src}
-                  className={`group mb-3 break-inside-avoid overflow-hidden rounded-[1.1rem] border p-2 shadow-[0_8px_24px_rgba(41,53,50,0.09)] transition-shadow duration-300 hover:shadow-[0_14px_32px_rgba(41,53,50,0.16)] sm:mb-4 sm:rounded-[1.35rem] sm:p-2.5 ${photoMats[index % photoMats.length]}`}
-                >
-                  <div className={`relative w-full overflow-hidden rounded-[0.75rem] bg-[#F0F1EC] ${ratio}`}>
-                    <Image
-                      src={src}
-                      alt={`Photo ${index + 1} from the birthday collection`}
-                      fill
-                      priority={index < 4}
-                      sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 23vw"
-                      className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.025]"
-                    />
-                  </div>
-                </figure>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="border-t border-ink/20 py-8 text-sm text-berry">
-            No photographs are available yet. Add image paths to the birthday photo collection to show them here.
-          </p>
-        )}
-
+        {images.length > 0 ? <div className="columns-2 gap-4 sm:columns-3 sm:gap-5 lg:columns-4 xl:columns-5">
+          {images.map((src,index) => {
+            const ratio = index % 5 === 0 ? "aspect-[5/4]" : index % 4 === 2 ? "aspect-[3/4]" : "aspect-[4/5]";
+            return <figure key={src} className={`group mb-4 break-inside-avoid overflow-hidden rounded-[1.2rem] border p-2 shadow-[0_8px_24px_rgba(41,53,50,0.09)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(41,53,50,0.16)] ${photoMats[index%photoMats.length]}`}>
+              <div className={`relative w-full overflow-hidden rounded-[0.8rem] bg-[#F0F1EC] ${ratio}`}><Image src={src} alt={`Photo ${index+1} from the birthday collection`} fill sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 20vw" className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.025]"/></div>
+            </figure>;
+          })}
+        </div> : <p className="border-t border-ink/20 py-8 text-sm text-berry">No photographs are available yet.</p>}
         <div className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-ink/20 pt-6 text-sm">
-          <Link className="font-semibold text-berry underline decoration-rose underline-offset-4 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry" href="/memories">
-            More memories
-          </Link>
-          <Link className="font-semibold text-berry underline decoration-rose underline-offset-4 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry" href="/surprise">
-            A birthday surprise
-          </Link>
-          <Link className="font-semibold text-berry underline decoration-rose underline-offset-4 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-berry" href="/blog">
-            The journal
-          </Link>
+          <Link className="font-bold text-berry underline decoration-rose underline-offset-4" href="/memories">More memories</Link>
+          <Link className="font-bold text-berry underline decoration-rose underline-offset-4" href="/surprise">A birthday surprise</Link>
+          <Link className="font-bold text-berry underline decoration-rose underline-offset-4" href="/blog">The journal</Link>
         </div>
       </section>
     </div>
