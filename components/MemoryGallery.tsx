@@ -223,7 +223,7 @@ export default function MemoryGallery() {
               setNotice(null);
               setShowUploader((current) => !current);
             }}
-            className="inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-200 transition hover:-translate-y-0.5 hover:bg-pink-400"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition duration-200 hover:-translate-y-0.5 hover:bg-[#64243D] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B] active:translate-y-0"
           >
             {showUploader ? <X size={16} /> : <Plus size={17} />}
             {showUploader ? "Close uploader" : "Add a memory"}
@@ -330,7 +330,7 @@ export default function MemoryGallery() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-full bg-mypink px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:bg-[#64243D] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
                 >
                   {submitting ? <LoaderCircle size={16} className="animate-spin" /> : <Upload size={16} />}
                   {submitting ? "Uploading..." : "Save memory"}
@@ -376,7 +376,7 @@ export default function MemoryGallery() {
           <button
             type="button"
             onClick={() => setShowUploader(true)}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-mypink px-5 py-3 text-sm font-semibold text-white shadow-md shadow-pink-100 transition hover:bg-pink-400"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-[#672039] bg-[#8B294B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B294B]/25 transition hover:bg-[#64243D] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
           >
             <Plus size={17} /> Add the first memory
           </button>
