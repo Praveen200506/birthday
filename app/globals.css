@@ -1,140 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Nunito:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-handwriting: var(--font-dancing), 'Dancing Script', 'Great Vibes', 'Caveat', cursive;
-  --font-sans: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-bodoni), "Bodoni Moda", Georgia, serif;
+  --font-sans: var(--font-nunito), "Nunito Sans", sans-serif;
 
-  --color-warm-cream: #FFF9F0;
-  --color-soft-pink: #FFD1DC;
-  --color-lavender: #E6E6FA;
-  --color-gold: #FFD700;
-  --color-mypink: #FFB7B2;
-  --color-foreground: #4A4A4A;
+  --color-mist: #EAF0EE;
+  --color-ink: #293532;
+  --color-rose: #B8757D;
+  --color-berry: #76515D;
+  --color-sage: #A5B4A4;
+  --color-ochre: #8B6A42;
 }
 
 :root {
-  --background: var(--color-warm-cream);
-  --foreground: var(--color-foreground);
+  color-scheme: light;
+  --background: #EAF0EE;
+  --foreground: #293532;
 }
 
-.font-handwriting {
-  font-family: var(--font-dancing), 'Dancing Script', 'Great Vibes', 'Caveat', cursive !important;
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.font-sans {
-  font-family: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif !important;
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-nunito), "Nunito Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-@layer base {
-  html, body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  body {
-    background: linear-gradient(-45deg, #FFF9F5, #FDF2F8, #F8F0FF, #FFFbf7);
-    background-size: 300% 300%;
-    animation: gradient 20s ease infinite;
-    color: var(--foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
-  h1, h2, h3, h4, h5, h6, p, span, a, button {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
-  ::selection {
-    background-color: var(--color-mypink);
-    color: white;
-  }
+.font-display {
+  font-family: var(--font-bodoni), "Bodoni Moda", Georgia, serif;
+  font-weight: 600;
 }
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+::selection {
+  background: #B8757D;
+  color: #293532;
 }
 
-/* Premium Scrollbar */
+:focus-visible {
+  outline: 2px solid #76515D;
+  outline-offset: 3px;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-@media (min-width: 640px) {
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(4px);
+  background: #EAF0EE;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, var(--color-soft-pink), var(--color-mypink));
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, var(--color-mypink), #ff9e99);
-}
-
-/* Floating Particles — pure CSS, no JS re-renders */
-@keyframes floatUp {
-  0% {
-    transform: translateY(110vh);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-10vh);
-    opacity: 0;
-  }
-}
-
-.floating-particle {
-  animation: floatUp linear infinite;
-  will-change: transform, opacity;
-}
-
-.hero-paper {
-  background:
-    radial-gradient(ellipse at 12% 18%, rgba(255, 219, 226, 0.48), transparent 34%),
-    radial-gradient(ellipse at 88% 78%, rgba(229, 220, 255, 0.42), transparent 38%),
-    linear-gradient(135deg, #fffaf6 0%, #fff6f7 48%, #fffaf7 100%);
+  background: #A5B4A4;
+  border: 2px solid #EAF0EE;
+  border-radius: 8px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
-    scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
