@@ -89,43 +89,17 @@ export default function MemoryTimeline({ images }: { images: readonly string[] }
 
     setUploadingId(id);
     try {
-      const response = await fetch("/api/memories/upload-url", {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("title", milestone.title.trim() || "A birthday memory");
+      formData.set("caption", milestone.description.trim());
+      const response = await fetch("/api/memories/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: file.type, size: file.size }),
+        body: formData,
       });
-      const signed = await response.json();
-      if (!response.ok || !signed.success || !signed.path || !signed.token || !signed.bucket || !signed.supabaseUrl || !signed.anonKey) {
-        throw new Error(signed.message || "Could not prepare the photo upload.");
-      }
-
-      // Use the same Supabase client and signed-upload flow as the Memories page.
-      // Public client configuration is supplied by the server route to avoid
-      // relying on potentially missing build-time NEXT_PUBLIC env in this component.
-      const supabase = createClient(signed.supabaseUrl, signed.anonKey, {
-        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-      });
-      const { error } = await supabase.storage
-        .from(signed.bucket)
-        .uploadToSignedUrl(signed.path, signed.token, file, {
-          contentType: file.type,
-          cacheControl: "3600",
-          upsert: false,
-        });
-      if (error) throw new Error("Supabase upload failed: " + error.message);
-
-      const saveResponse = await fetch("/api/memories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: milestone.title.trim() || "A birthday memory",
-          caption: milestone.description.trim(),
-          storagePath: signed.path,
-        }),
-      });
-      const saveData = await saveResponse.json();
-      if (!saveResponse.ok || !saveData.success || !saveData.memory?.imageUrl) {
-        throw new Error(saveData.message || "The photo uploaded, but the memory could not be saved.");
+      const saveData = await response.json();
+      if (!response.ok || !saveData.success || !saveData.memory?.imageUrl) {
+        throw new Error(saveData.message || "Photo upload failed. Please try again.");
       }
 
       const savedMemory = saveData.memory as SavedMemory;
