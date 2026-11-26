@@ -16,27 +16,6 @@ const photoMats = [
   "bg-[#E8DFC9] border-[#C9B994]",
 ];
 
-function groupPhotosByDate(images: readonly string[]): PhotoMoment[] {
-  const groups = new Map<string, PhotoMoment>();
-
-  for (const image of images) {
-    const match = image.match(/IMG[-_](\d{4})(\d{2})(\d{2})/i);
-    if (!match) continue;
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-    if (month < 1 || month > 12 || day < 1 || day > 31) continue;
-
-    const key = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const current = groups.get(key);
-    if (current) current.photos.push(image);
-    else groups.set(key, { key, year, month, photos: [image] });
-  }
-
-  return [...groups.values()].sort((a, b) => a.key.localeCompare(b.key));
-}
-
 export default function HeroSection({ images }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
 
@@ -129,7 +108,6 @@ export default function HeroSection({ images }: HeroSectionProps) {
           <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4">
             {images.map((src, index) => {
               const ratio = index % 5 === 0 ? "aspect-[5/4]" : index % 4 === 2 ? "aspect-[3/4]" : "aspect-[4/5]";
-              const timelineMoment = timeline.find((moment) => moment.photos[0] === src);
               return (
                 <figure
                   key={src}
