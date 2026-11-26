@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { birthdayConfig } from "@/data/birthdayConfig";
 
 const CELEBRATION_PARTICLES = [
     { x: -120, y: -150, color: '#FFD700' },
@@ -196,8 +197,8 @@ const Cake = ({ onAllCandlesOut }: CakeProps) => {
                 transition={{ duration: 3, repeat: Infinity }}
             >
                 {candles.some((c) => c)
-                    ? "Make a wish & blow the candles! 🎂"
-                    : "Wishes do come true! ✨"}
+                    ? birthdayConfig.surprise.instructions
+                    : birthdayConfig.surprise.completedCopy}
             </motion.p>
         </div>
     );
