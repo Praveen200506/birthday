@@ -31,6 +31,7 @@ export const viewport: Viewport = {
 
 import FinalScene from "@/components/FinalScene";
 import VisitorTracker from "@/components/VisitorTracker";
+import RoamingMascot from "@/components/RoamingMascot";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -51,6 +52,7 @@ export default function RootLayout({
         <GlobalLockWrapper>
           <FinalScene />
           <AudioPlayer />
+          <RoamingMascot />
           <main className="relative min-h-[100dvh] w-full">
             {children}
           </main>
