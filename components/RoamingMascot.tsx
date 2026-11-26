@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { birthdayConfig } from "@/data/birthdayConfig";
+import sharmilaMascotSrc from "@/data/sharmilaMascot";
 import { Sparkles, X } from "lucide-react";
 
 const PET_WIDTH = 116;
@@ -113,7 +114,7 @@ export default function RoamingMascot() {
               style={{ transformStyle: "preserve-3d" }}
             >
               <motion.img
-                src="/images/sharmila-mascot.webp"
+                src={sharmilaMascotSrc}
                 alt=""
                 draggable={false}
                 className="relative z-10 block h-auto w-full select-none drop-shadow-[0_18px_16px_rgba(55,28,42,.24)]"
