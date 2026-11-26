@@ -77,7 +77,7 @@ export default function SurpriseSection() {
             <motion.div initial={reduceMotion ? false : { scale: 0.7, rotate: -12 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 180, damping: 12, delay: 0.12 }} className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#FCE5E8] text-[#8B294B]"><Heart size={30} fill="currentColor" /></motion.div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#A43F60]">Made with love</p>
             <h2 id="birthday-wish-title" className="mt-3 font-display text-4xl text-[#38252E] sm:text-5xl">{config.surprise.modalTitle}</h2>
-            <p className="mt-5 font-display text-xl italic leading-relaxed text-[#684E55]">“{config.surprise.modalWish}”</p>
+            <p className="mt-5 font-display text-xl italic leading-relaxed text-[#684E55]">"{config.surprise.modalWish}"</p>
             <p className="mt-4 text-sm leading-6 text-[#795F65]">{config.surprise.modalCopy}</p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button type="button" onClick={() => setIsOpen(false)} className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-[#672039] bg-[#8B294B] px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#64243D]">Thank you</button>
