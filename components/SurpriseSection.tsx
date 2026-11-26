@@ -3,10 +3,10 @@
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Heart, RotateCcw, X } from "lucide-react";
+import { ArrowRight, Heart, RotateCcw, X, ChevronRight } from "lucide-react";
 import Cake from "./Cake";
 import { birthdayConfig as config } from "@/data/birthdayConfig";
-import { Lightbulb, WandSparkles } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 
 export default function SurpriseSection() {
   const [candlesOut, setCandlesOut] = useState(false);
