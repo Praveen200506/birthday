@@ -241,7 +241,7 @@ export default function RoamingMascot() {
       window.removeEventListener("pointerdown", onActivity);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [mascot.enabled, clampPoint, chooseDestination, renderPosition, setState]);
+  }, [mascot.enabled, clampPoint, chooseDestination, renderPosition, setState, reducedMotion]);
 
   const moveDraggedPet = useCallback((clientX: number, clientY: number) => {
     positionRef.current = clampPoint({
