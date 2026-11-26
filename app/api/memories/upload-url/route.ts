@@ -107,6 +107,8 @@ export async function POST(request: NextRequest) {
       bucket: storageConfig.bucket,
       path: storagePath,
       token: data.token,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || storageConfig.url,
+      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
     });
   } catch (error) {
     console.error("Unexpected signed memory upload error:", error);
