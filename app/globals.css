@@ -2,6 +2,7 @@
 
 @theme {
   --font-display: var(--font-bodoni), "Bodoni Moda", Georgia, serif;
+  --font-handwriting: var(--font-bodoni), "Bodoni Moda", Georgia, serif;
   --font-sans: var(--font-nunito), "Nunito Sans", sans-serif;
   --color-mist: #FFF0E9;
   --color-ink: #38252E;
