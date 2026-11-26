@@ -14,23 +14,15 @@ const navItems = [
 
 export default function Navbar() {
   const pathname = usePathname();
-
   return (
-    <nav
-      aria-label="Main navigation"
-      className="fixed bottom-3 left-1/2 z-[60] w-max max-w-[calc(100vw-1.25rem)] -translate-x-1/2"
-    >
-      <div className="flex items-center gap-2 rounded-full border border-ink/15 bg-mist px-3 py-2 shadow-[0_8px_30px_rgba(41,53,50,0.12)] sm:gap-5 sm:px-5">
+    <nav aria-label="Main navigation" className="fixed bottom-3 left-1/2 z-[60] w-max max-w-[calc(100vw-1.25rem)] -translate-x-1/2">
+      <div className="flex items-center gap-1 rounded-full border-2 border-[#DDA9A9] bg-[#FFF9F4]/95 px-2 py-2 shadow-[0_10px_34px_rgba(102,43,61,0.20)] backdrop-blur-xl sm:gap-3 sm:px-4">
         {navItems.map((item) => {
           const active = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);
           return (
-            <Link
-              key={item.path}
-              href={item.path}
-              aria-current={active ? "page" : undefined}
-              className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-1 text-[10px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-berry sm:text-xs ${active ? "text-berry" : "text-ink/65 hover:text-ink"}`}
-            >
-              <item.icon aria-hidden="true" className="h-4 w-4 sm:h-[18px] sm:w-[18px]" strokeWidth={1.7} />
+            <Link key={item.path} href={item.path} aria-current={active ? "page" : undefined}
+              className={"flex min-w-0 flex-col items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-bold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B294B] sm:min-w-[58px] sm:px-3 sm:text-xs " + (active ? "bg-[#8B294B] text-white shadow-md" : "text-[#59313F] hover:bg-[#F9E2E3] hover:text-[#762D49]")}>
+              <item.icon aria-hidden="true" className="h-4 w-4 sm:h-[18px] sm:w-[18px]" strokeWidth={1.9} />
               <span>{item.name}</span>
             </Link>
           );
