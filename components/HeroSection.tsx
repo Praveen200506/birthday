@@ -2,23 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import MemoryTimeline from "@/components/MemoryTimeline";
 import { motion, useReducedMotion } from "framer-motion";
 
 interface HeroSectionProps {
   images: readonly string[];
 }
-
-interface PhotoMoment {
-  key: string;
-  year: number;
-  month: number;
-  photos: string[];
-}
-
-const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
 
 const photoMats = [
   "bg-[#D8E0D8] border-[#A8B8AA]",
@@ -50,7 +39,6 @@ function groupPhotosByDate(images: readonly string[]): PhotoMoment[] {
 
 export default function HeroSection({ images }: HeroSectionProps) {
   const reduceMotion = useReducedMotion();
-  const timeline = groupPhotosByDate(images);
 
   return (
     <div className="min-h-screen overflow-hidden bg-mist text-ink">
@@ -115,61 +103,7 @@ export default function HeroSection({ images }: HeroSectionProps) {
         </a>
       </motion.section>
 
-      {timeline.length > 0 && (
-        <section
-          aria-labelledby="timeline-heading"
-          className="mx-auto max-w-7xl px-5 pb-20 pt-4 sm:px-8 lg:px-12 lg:pb-28"
-        >
-          <div className="mb-10 border-t border-ink/20 pt-6">
-            <p className="text-sm font-semibold text-berry">Dates in our photographs</p>
-            <h2
-              id="timeline-heading"
-              className="mt-2 font-display text-4xl leading-tight tracking-tight sm:text-5xl"
-            >
-              A little timeline
-            </h2>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-ink/75">
-              A few dates, kept close. Each one leads back to the photographs from that day.
-            </p>
-          </div>
-
-          <div className="relative grid gap-9 before:absolute before:bottom-3 before:left-[7px] before:top-3 before:w-px before:bg-rose/60 sm:grid-cols-2 sm:gap-8 sm:before:bottom-auto sm:before:left-0 sm:before:right-0 sm:before:top-[7px] sm:before:h-px sm:before:w-auto">
-            {timeline.map((moment, index) => (
-              <a
-                key={moment.key}
-                href={`#photo-${moment.key}`}
-                className="group relative grid grid-cols-[24px_1fr] gap-4 pl-0 sm:grid-cols-1 sm:gap-5 sm:pl-0"
-              >
-                <span className="relative z-10 mt-1.5 ml-0.5 h-3.5 w-3.5 rounded-full border-[3px] border-mist bg-berry ring-1 ring-berry sm:ml-0 sm:mt-0" />
-                <div className="grid grid-cols-[104px_1fr] items-center gap-4 sm:grid-cols-[minmax(120px,0.7fr)_1fr] sm:items-start">
-                  <div className={`relative aspect-[4/5] overflow-hidden rounded-xl border p-1.5 ${photoMats[index % photoMats.length]}`}>
-                    <div className="relative h-full w-full overflow-hidden rounded-lg bg-[#F2F0E9]">
-                      <Image
-                        src={moment.photos[0]}
-                        alt={`Photograph from ${monthNames[moment.month - 1]} ${moment.year}`}
-                        fill
-                        sizes="(max-width: 640px) 104px, 180px"
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-                  <div className="py-1">
-                    <p className="font-display text-2xl leading-tight text-ink sm:text-3xl">
-                      {monthNames[moment.month - 1]} {moment.year}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-ink/75">
-                      {moment.photos.length} {moment.photos.length === 1 ? "photograph" : "photographs"} from this date
-                    </p>
-                    <span className="mt-3 inline-block text-xs font-semibold text-berry underline decoration-rose underline-offset-4 transition-colors group-hover:text-ink">
-                      Find these in the collection
-                    </span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+      <MemoryTimeline images={images} />
 
       <section
         id="photographs"
