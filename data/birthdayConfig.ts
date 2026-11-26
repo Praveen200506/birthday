@@ -44,6 +44,13 @@ export const birthdayConfig = {
       { id: "placeholder-3", date: "", title: "A memory to come back to", description: "Write a personal note here and choose the photograph that belongs with it.", image: "" },
     ],
   },
+  memories: {
+    eyebrow: "Little things, forever memories",
+    heading: "Our Little Universe",
+    description: "A growing collection of moments worth keeping. Every new memory is saved and will be here the next time you visit.",
+    emptyHeading: "A fresh page for new memories",
+    emptyDescription: "No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.",
+  },
   mascot: {
     label: "Birthday buddy",
     ariaLabel: "Open the birthday companion",
