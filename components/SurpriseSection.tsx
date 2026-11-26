@@ -11,6 +11,7 @@ export default function SurpriseSection() {
   const [candlesOut, setCandlesOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
+  const [cakeRun, setCakeRun] = useState(0);
   const reduceMotion = useReducedMotion();
 
   const handleAllCandlesOut = () => {
@@ -27,6 +28,7 @@ export default function SurpriseSection() {
     setIsOpen(false);
     setShowFinal(false);
     setCandlesOut(false);
+    setCakeRun((run) => run + 1);
   };
 
   return (
@@ -49,7 +51,7 @@ export default function SurpriseSection() {
       </motion.header>
 
       <div className="relative z-10 mx-auto w-full max-w-[680px] lg:mx-0 lg:w-[48%]">
-        {!candlesOut ? <Cake onAllCandlesOut={handleAllCandlesOut} /> : (
+        {!candlesOut ? <Cake key={cakeRun} onAllCandlesOut={handleAllCandlesOut} /> : (
           <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 170, damping: 18 }}
             className="birthday-glow mx-auto mt-8 max-w-lg rounded-3xl border border-[#E7B7B4] bg-[#FFF9F4]/95 p-7 shadow-[0_18px_55px_rgba(126,53,74,0.16)] backdrop-blur-xl sm:p-10">
