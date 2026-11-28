@@ -33,6 +33,7 @@ export default function RoamingMascot() {
   const [ready, setReady] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [cursorNear, setCursorNear] = useState(false);
+  const [poseImageFailed, setPoseImageFailed] = useState(false);
 
   const petRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef<Point>({ x: 0, y: 0 });
@@ -65,6 +66,9 @@ export default function RoamingMascot() {
             ? ["We are on the Home page. Start with the birthday highlights and photos.", "Use the navigation to visit Memories, Letter, Surprise, or Blog.", "Scroll through this page to explore the birthday collection."]
             : ["I can help you explore this page. Check its headings and buttons for the available actions."];
   const introMessage = "Hi! I’m Nandhuuuu, your little website companion. Tap me for hints about the page you’re visiting. Right-click me to control what I do!";
+  const poseImage = ({ idle: "idle", walking: "walking", curious: "curious", following: "following", jumping: "jumping", sitting: "sitting", sleeping: "sleeping", dragging: "idle" } as const)[petState];
+
+  useEffect(() => { setPoseImageFailed(false); }, [poseImage]);
 
   const setState = useCallback((next: PetState, duration = 0) => {
     stateRef.current = next;
@@ -392,7 +396,9 @@ export default function RoamingMascot() {
           >
             <div className={`chibi-pet-sprite chibi-pet-${petState} ${reducedMotion ? "chibi-pet-reduced" : ""}`} data-facing={facingLeft ? "left" : "right"}>
               <motion.img
-                src={sharmilaMascotSrc}
+                key={poseImage}
+                src={poseImageFailed ? sharmilaMascotSrc : "/images/nandhuuuu/" + poseImage + ".png"}
+                onError={() => setPoseImageFailed(true)}
                 alt=""
                 draggable={false}
                 className="relative z-10 block h-auto w-full select-none drop-shadow-[0_18px_16px_rgba(55,28,42,.24)]"
@@ -401,8 +407,6 @@ export default function RoamingMascot() {
               <span className="pointer-events-none absolute -bottom-1 left-1/2 h-4 w-16 -translate-x-1/2 rounded-[50%] bg-[#5D344A]/20 blur-md" />
               <Sparkles className="pointer-events-none absolute right-0 top-[27%] z-20 h-4 w-4 text-[#C18B45] drop-shadow" />
               <span className="pointer-events-none absolute left-0 top-[42%] z-20 h-2 w-2 rounded-full bg-white/70 blur-[1px]" />
-              {petState === "sleeping" && <span className="chibi-pet-zzz" aria-hidden="true">Z z z</span>}
-              {petState === "curious" && <span className="chibi-pet-thought" aria-hidden="true">?</span>}
             </div>
             <span className="mt-1 flex items-center gap-1 rounded-full border border-white/90 bg-[#FFF9F4]/95 px-3 py-1.5 text-[10px] font-extrabold text-[#8B294B] shadow-[0_6px_20px_rgba(69,30,49,.16)]">
               <Sparkles size={11} />{mascot.label}
