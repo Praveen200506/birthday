@@ -365,7 +365,7 @@ export default function RoamingMascot() {
           style={{ transform: `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0)` }}
         >
           <AnimatePresence>
-            {messageIndex !== null && (
+            {messageText !== null && (
               <motion.div
                 key={messageText}
                 initial={{ opacity: 0, y: 10, scale: 0.94 }}
