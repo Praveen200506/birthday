@@ -47,7 +47,7 @@ export default function RoamingMascot() {
   const lastFrameRef = useRef(0);
   const stateDeadlineRef = useRef(0);
   const nextDecisionRef = useRef(0);
-  const lastActivityRef = useRef(Date.now());
+  const lastActivityRef = useRef(0);
   const lastCursorReactionRef = useRef(0);
   const followDeadlineRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -124,6 +124,7 @@ export default function RoamingMascot() {
   useEffect(() => {
     if (!mascot.enabled) return;
 
+    lastActivityRef.current = Date.now();
     const initial = clampPoint({
       x: window.innerWidth - PET_WIDTH - 24,
       y: window.innerHeight * 0.48,
