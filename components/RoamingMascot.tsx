@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { birthdayConfig } from "@/data/birthdayConfig";
 import sharmilaMascotSrc from "@/data/sharmilaMascot";
@@ -21,7 +22,12 @@ const randomBetween = (min: number, max: number) => min + Math.random() * (max -
 const distance = (a: Point, b: Point) => Math.hypot(b.x - a.x, b.y - a.y);
 
 export default function RoamingMascot() {
-  const [messageIndex, setMessageIndex] = useState<number | null>(null);
+  const [messageText, setMessageText] = useState<string | null>(null);
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [roamingPaused, setRoamingPaused] = useState(false);
+  const introShownRef = useRef(false);
+  const pathname = usePathname();
   const [petState, setPetState] = useState<PetState>("idle");
   const [facingLeft, setFacingLeft] = useState(false);
   const [ready, setReady] = useState(false);
@@ -47,6 +53,18 @@ export default function RoamingMascot() {
   const rafRef = useRef<number | null>(null);
   const reducedMotion = useReducedMotion();
   const mascot = birthdayConfig.mascot;
+  const pageHints = pathname.startsWith("/memories")
+    ? ["This is the Memories page. Browse the saved moments here.", "Tap a memory to open it, or use the upload option to add another photo.", "I will keep you company while you explore these memories."]
+    : pathname.startsWith("/letter")
+      ? ["We are on the Letter page. This is where the birthday message lives.", "Take your time reading the letter. It was made for this celebration.", "Use the navigation whenever you want to visit another page."]
+      : pathname.startsWith("/surprise")
+        ? ["Welcome to the Surprise page! Follow the instructions here to reveal the surprise.", "Make a wish before you finish the candle activity.", "Tap the candles on this page to continue."]
+        : pathname.startsWith("/blog")
+          ? ["This is the Blog page. You can browse the posts shared here.", "Open a post to read the full story.", "Use the write option if you have access to create a post."]
+          : pathname === "/"
+            ? ["We are on the Home page. Start with the birthday highlights and photos.", "Use the navigation to visit Memories, Letter, Surprise, or Blog.", "Scroll through this page to explore the birthday collection."]
+            : ["I can help you explore this page. Check its headings and buttons for the available actions."];
+  const introMessage = "Hi! I’m Nandhuuuu, your little website companion. Tap me for hints about the page you’re visiting. Right-click me to control what I do!";
 
   const setState = useCallback((next: PetState, duration = 0) => {
     stateRef.current = next;
@@ -148,6 +166,11 @@ export default function RoamingMascot() {
       const dt = Math.min((now - previous) / 1000, 0.05);
       lastFrameRef.current = now;
 
+      if (roamingPaused) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
       const currentState = stateRef.current;
       if (currentState !== "dragging" && currentState !== "jumping" && currentState !== "sleeping" && currentState !== "sitting") {
         const cursor = cursorRef.current;
@@ -241,7 +264,7 @@ export default function RoamingMascot() {
       window.removeEventListener("pointerdown", onActivity);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [mascot.enabled, clampPoint, chooseDestination, renderPosition, setState, reducedMotion]);
+  }, [mascot.enabled, clampPoint, chooseDestination, renderPosition, setState, reducedMotion, roamingPaused]);
 
   const moveDraggedPet = useCallback((clientX: number, clientY: number) => {
     positionRef.current = clampPoint({
@@ -280,9 +303,41 @@ export default function RoamingMascot() {
 
   if (!mascot.enabled) return null;
 
-  const nextHint = () => setMessageIndex((index) => index === null ? 0 : (index + 1) % mascot.messages.length);
+  const showNextHint = () => {
+    if (!introShownRef.current) {
+      introShownRef.current = true;
+      setMessageText(introMessage);
+      return;
+    }
+    setMessageText(pageHints[messageIndex % pageHints.length]);
+    setMessageIndex((index) => (index + 1) % pageHints.length);
+  };
+  const openPetMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMenuOpen((open) => !open);
+  };
+  const runPetAction = (action: "pause" | "follow" | "walk" | "sit" | "sleep" | "jump" | "wake") => {
+    setMenuOpen(false);
+    if (action === "pause") {
+      setRoamingPaused((paused) => !paused);
+      setState("idle");
+      return;
+    }
+    setRoamingPaused(false);
+    if (action === "follow") {
+      const cursor = cursorRef.current;
+      if (cursor) chooseDestination({ x: cursor.x - PET_WIDTH / 2, y: cursor.y - PET_HEIGHT / 2 });
+      else setState("curious", 2200);
+    }
+    if (action === "walk") chooseDestination();
+    if (action === "sit") setState("sitting", 8000);
+    if (action === "sleep") setState("sleeping", 15000);
+    if (action === "jump") setState("jumping", 760);
+    if (action === "wake") setState("idle");
+  };
   const startDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if ((event.target as HTMLElement).closest("[data-pet-close]")) return;
+    if (event.button !== 0 || (event.target as HTMLElement).closest("[data-pet-close], [data-pet-menu]")) return;
     event.preventDefault();
     pointerStartRef.current = { x: event.clientX, y: event.clientY };
     dragOffsetRef.current = { x: event.clientX - positionRef.current.x, y: event.clientY - positionRef.current.y };
@@ -296,7 +351,7 @@ export default function RoamingMascot() {
       return;
     }
     if (didDragRef.current) return;
-    setMessageIndex((index) => index === null ? 0 : (index + 1) % mascot.messages.length);
+    showNextHint();
     setState("jumping", 760);
     nextDecisionRef.current = performance.now() + 760;
   };
@@ -312,15 +367,15 @@ export default function RoamingMascot() {
           <AnimatePresence>
             {messageIndex !== null && (
               <motion.div
-                key={messageIndex}
+                key={messageText}
                 initial={{ opacity: 0, y: 10, scale: 0.94 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.96 }}
                 className="absolute bottom-[calc(100%-8px)] right-0 mb-3 w-60 max-w-[min(15rem,85vw)] rounded-2xl border border-[#E7B7B4] bg-[#FFF9F4] p-3 text-left text-xs leading-5 text-[#59313F] shadow-[0_16px_45px_rgba(54,26,39,.22)]"
               >
-                <button type="button" data-pet-close onClick={() => setMessageIndex(null)} aria-label="Close hint" className="absolute right-2 top-2 rounded-full p-1 text-[#8B294B] hover:bg-[#F8E5E3]"><X size={13} /></button>
-                <p className="pr-5">{mascot.messages[messageIndex]}</p>
-                <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-[#A43F60]">Tap me for another hint</span>
+                <button type="button" data-pet-close onClick={() => setMessageText(null)} aria-label="Close hint" className="absolute right-2 top-2 rounded-full p-1 text-[#8B294B] hover:bg-[#F8E5E3]"><X size={13} /></button>
+                <p className="pr-5">{messageText}</p>
+                <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-[#A43F60]">Hints for this page</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -329,8 +384,9 @@ export default function RoamingMascot() {
             type="button"
             onPointerDown={startDrag}
             onClick={handleClick}
+            onContextMenu={openPetMenu}
             aria-label={mascot.ariaLabel + ". Drag to move, tap for a birthday hint."}
-            aria-expanded={messageIndex !== null}
+            aria-expanded={messageText !== null || menuOpen}
             className="group flex w-full cursor-grab flex-col items-center rounded-3xl p-1 active:cursor-grabbing focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8B294B]"
           >
             <div className={`chibi-pet-sprite chibi-pet-${petState} ${reducedMotion ? "chibi-pet-reduced" : ""}`} data-facing={facingLeft ? "left" : "right"}>
@@ -350,8 +406,24 @@ export default function RoamingMascot() {
             <span className="mt-1 flex items-center gap-1 rounded-full border border-white/90 bg-[#FFF9F4]/95 px-3 py-1.5 text-[10px] font-extrabold text-[#8B294B] shadow-[0_6px_20px_rgba(69,30,49,.16)]">
               <Sparkles size={11} />{mascot.label}
             </span>
-            <span className="mt-1 text-[9px] font-semibold text-[#8B294B]/70 opacity-0 transition-opacity group-hover:opacity-100">drag me around</span>
+            <span className="mt-1 text-[9px] font-semibold text-[#8B294B]/70 opacity-0 transition-opacity group-hover:opacity-100">drag · tap · right-click</span>
           </button>
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div data-pet-menu role="menu" initial={{ opacity: 0, y: 8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 6, scale: 0.96 }} className="absolute right-full top-1/3 mr-2 flex w-40 flex-col gap-1 rounded-2xl border border-[#E7B7B4] bg-[#FFF9F4] p-2 text-left shadow-[0_12px_36px_rgba(54,26,39,.22)]">
+                <p className="px-2 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#A43F60]">Nandhuuuu’s actions</p>
+                {[
+                  [roamingPaused ? "Resume roaming" : "Pause roaming", "pause"],
+                  ["Follow cursor", "follow"], ["Walk around", "walk"],
+                  ["Sit down", "sit"], ["Go to sleep", "sleep"],
+                  ["Jump!", "jump"], ["Wake up", "wake"],
+                ].map(([label, action]) => (
+                  <button key={action} type="button" role="menuitem" onPointerDown={(event) => event.stopPropagation()} onClick={() => runPetAction(action as "pause" | "follow" | "walk" | "sit" | "sleep" | "jump" | "wake")} className="rounded-xl px-2 py-1.5 text-left text-[11px] font-semibold text-[#59313F] transition-colors hover:bg-[#F8E5E3]">{label}</button>
+                ))}
+                <button type="button" onPointerDown={(event) => event.stopPropagation()} onClick={() => setMenuOpen(false)} className="mt-1 rounded-xl bg-[#8B294B] px-2 py-1.5 text-[11px] font-bold text-white">Close menu</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {cursorNear && petState !== "dragging" && petState !== "sleeping" && (
             <span className="pointer-events-none absolute -top-2 right-1 text-[9px] text-[#A43F60]">♡</span>
           )}
