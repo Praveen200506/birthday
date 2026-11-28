@@ -56,7 +56,7 @@ export const birthdayConfig = {
     emptyDescription: "No memories have been added yet. Once you upload the first photo, it will appear here and stay saved for future visits.",
   },
   mascot: {
-    label: "Birthday buddy",
+    label: "Nandhuuuu",
     ariaLabel: "Open the birthday companion",
     messages: [
       "Psst… there are more memories waiting to be explored.",
