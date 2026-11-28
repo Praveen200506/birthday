@@ -363,7 +363,7 @@ export default function RoamingMascot() {
         <div
           ref={petRef}
           className="pointer-events-auto absolute left-0 top-0 w-[96px] sm:w-[116px] touch-none will-change-transform"
-          style={{ transform: `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0)` }}
+          style={{ transform: "translate3d(0, 0, 0)" }}
         >
           <AnimatePresence>
             {messageText !== null && (
