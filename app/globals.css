@@ -91,7 +91,7 @@ body::before {
 }
 
 
-/* Autonomous birthday companion — the original illustration remains the sprite. */
+/* Nandhuuuu companion: gentle, low-amplitude motion keeps movement calm. */
 .chibi-pet-sprite {
   position: relative;
   width: 100%;
@@ -124,8 +124,8 @@ body::before {
   50% { transform: translateY(-3px) scale(1.012, 1.018); }
 }
 @keyframes chibi-walk {
-  0%, 100% { transform: translateY(0) rotate(-1deg); }
-  50% { transform: translateY(-5px) rotate(1deg); }
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50% { transform: translateY(-3px) rotate(0.6deg); }
 }
 @keyframes chibi-curious {
   0%, 100% { transform: rotate(0) translateY(0); }
@@ -134,9 +134,9 @@ body::before {
 }
 @keyframes chibi-jump {
   0% { transform: translateY(0) scale(1); }
-  28% { transform: translateY(-32px) scale(1.04, .96); }
-  55% { transform: translateY(-38px) scale(.98, 1.03); }
-  82% { transform: translateY(2px) scale(1.06, .94); }
+  28% { transform: translateY(-24px) scale(1.025, .98); }
+  55% { transform: translateY(-30px) scale(.99, 1.02); }
+  82% { transform: translateY(1px) scale(1.025, .98); }
   100% { transform: translateY(0) scale(1); }
 }
 @keyframes chibi-sit {
